@@ -6,7 +6,7 @@ import (
 )
 
 type ESClient struct {
-	client *elasticsearch.Client
+	Client *elasticsearch.Client
 }
 
 func NewElasticClient() (*ESClient, error) {
@@ -23,6 +23,6 @@ func NewElasticClient() (*ESClient, error) {
 
 	res.Body.Close()
 	return &ESClient{
-		client: es,
+		Client: es,
 	}, nil
 }

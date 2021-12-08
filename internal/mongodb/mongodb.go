@@ -8,9 +8,9 @@ import (
 )
 
 type MongoClient struct {
-	client      *mongo.Client
-	ctx         context.Context
-	collections map[string]*mongo.Collection
+	Client      *mongo.Client
+	Ctx         context.Context
+	Collections map[string]*mongo.Collection
 }
 
 func NewMongoClient() (*MongoClient, error) {
@@ -33,12 +33,12 @@ func NewMongoClient() (*MongoClient, error) {
 	}
 
 	return &MongoClient{
-		client:      client,
-		ctx:         ctx,
-		collections: collections,
+		Client:      client,
+		Ctx:         ctx,
+		Collections: collections,
 	}, nil
 }
 
 func (c *MongoClient) Close() {
-	c.client.Disconnect(c.ctx)
+	c.Client.Disconnect(c.Ctx)
 }

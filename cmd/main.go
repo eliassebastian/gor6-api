@@ -5,7 +5,6 @@ import (
 	"github.com/eliassebastian/gor6-api/internal/elastic"
 	"github.com/eliassebastian/gor6-api/internal/mongodb"
 	"github.com/eliassebastian/gor6-api/internal/pubsub"
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"os"
@@ -96,7 +95,11 @@ type serverConfig struct {
 }
 
 func newServer(c serverConfig) (*http.Server, error) {
-	mux := chi.NewRouter()
-	log.Println(mux)
-	return &http.Server{}, nil
+	return &http.Server{
+		Addr:         ":8090",
+		Handler:      routes(c),
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
+	}, nil
 }
