@@ -35,7 +35,6 @@ func NewPlayerController(c *elastic.ESClient, m *mongodb.MongoClient, p *sync.Ma
 }
 
 func (pc *PlayerController) fetchProfileId(ctx context.Context, n, p string) (string, error) {
-	log.Println("FetchProfileId", n, p)
 	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v3/profiles?namesOnPlatform=%s&platformType=%s", n, p)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -60,13 +59,11 @@ func (pc *PlayerController) fetchProfileId(ctx context.Context, n, p string) (st
 
 	//appid? 3587dcbb-7f81-457c-9781-0e3f29f6f56a
 	res, _ := pc.hc.Do(req)
-	fmt.Println(res)
 	if res.StatusCode != 200 {
 		return "", errors.New(fmt.Sprintf("error fetching profileId STATUS CODE %v // S: %s", res.StatusCode, res.Status))
 	}
-	log.Println("BODY: ", res.Body)
+
 	var player models.PlayerIDModel
-	//var player map[string]string
 	de := json.NewDecoder(res.Body).Decode(&player)
 	if de != nil {
 		return "", errors.New("error decoding player")
