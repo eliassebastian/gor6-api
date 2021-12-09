@@ -1,6 +1,7 @@
 package pubsub
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"github.com/segmentio/kafka-go"
@@ -66,8 +67,7 @@ func (c *Consumer) write(b []byte) error {
 	var session map[string]string
 	log.Println(b)
 	//var session models.Session
-	//TODO: find alternate to json Unmarshal method
-	err := json.Unmarshal(b, &session)
+	err := json.NewDecoder(bytes.NewReader(b)).Decode(&session)
 	if err != nil {
 		log.Println(err)
 		return err

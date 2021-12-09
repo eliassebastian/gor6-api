@@ -1,13 +1,17 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
 	"github.com/eliassebastian/gor6-api/internal/mongodb"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -16,6 +20,7 @@ type PlayerController struct {
 	ec *elastic.ESClient
 	mc *mongodb.MongoClient
 	sm *sync.Map
+	hc *http.Client
 }
 
 func NewPlayerController(c *elastic.ESClient, m *mongodb.MongoClient, p *sync.Map) *PlayerController {
@@ -23,34 +28,28 @@ func NewPlayerController(c *elastic.ESClient, m *mongodb.MongoClient, p *sync.Ma
 		ec: c,
 		mc: m,
 		sm: p,
+		hc: &http.Client{
+			Timeout: 10 * time.Second,
+		},
 	}
 }
 
-func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
-	platform := chi.URLParam(r, "platform")
-	player := chi.URLParam(r, "player")
-
-	client := &http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v3/profiles?namesOnPlatform=%s&platformType=%s", player, platform)
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func (pc *PlayerController) fetchProfileId(ctx context.Context, n, p string) (string, error) {
+	log.Println("FetchProfileId", n, p)
+	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v3/profiles?namesOnPlatform=%s&platformType=%s", n, p)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println(req, err)
+		return "", err
 	}
 
 	sd, ok := pc.sm.Load("session")
 	if !ok {
-		log.Println("Error Retrieving Sync Map Session")
-		return
+		return "", errors.New("error retrieving sync map session")
 	}
 
 	re, ok := sd.(map[string]string)
 	if !ok {
-		log.Println("Type Assertion Error")
-		return
+		return "", errors.New("type assertion error")
 	}
 	req.Header = http.Header{
 		"Authorization": []string{fmt.Sprintf("Ubi_v1 t=%s", re["ticket"])},
@@ -59,26 +58,42 @@ func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 		"Connection":    []string{"keep-alive"},
 	}
 
-	res, err := client.Do(req)
-
-	fmt.Println("STATUS CODE:::::", res.StatusCode)
-
-	if err != nil {
-		log.Println(res, err)
+	//appid? 3587dcbb-7f81-457c-9781-0e3f29f6f56a
+	res, _ := pc.hc.Do(req)
+	fmt.Println(res)
+	if res.StatusCode != 200 {
+		return "", errors.New(fmt.Sprintf("error fetching profileId STATUS CODE %v // S: %s", res.StatusCode, res.Status))
 	}
-
-	log.Println("SUCCESS:  ", res, err, res.Body)
-	defer res.Body.Close()
-
-	var result map[string]interface{}
-
-	err2 := json.NewDecoder(res.Body).Decode(&result)
-
-	if err2 != nil {
-		log.Fatalln(err)
+	log.Println("BODY: ", res.Body)
+	var player models.PlayerIDModel
+	//var player map[string]string
+	de := json.NewDecoder(res.Body).Decode(&player)
+	if de != nil {
+		return "", errors.New("error decoding player")
 	}
+	res.Body.Close()
+	return player.Profiles[0].IDOnPlatform, nil
+}
 
-	fmt.Println(result)
+func (pc *PlayerController) fetchPlayer(ctx context.Context, n, p string) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	//search elastic (check direct name and alias)
+
+	//if found, put in cache
+	//return to request
+
+	//if not found check for profileId
+	profileId, err := pc.fetchProfileId(ctx, n, p)
+	log.Println(profileId)
+	return []byte(profileId), err
+}
+
+func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
+	platform := strings.ToLower(chi.URLParam(r, "platform"))
+	player := strings.ToLower(chi.URLParam(r, "player"))
+	res, _ := pc.fetchPlayer(r.Context(), player, platform)
+	w.Write(res)
 }
 
 func (pc *PlayerController) GetPlayers(w http.ResponseWriter, r *http.Request) {
