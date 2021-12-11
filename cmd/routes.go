@@ -12,7 +12,7 @@ func routes(c serverConfig) http.Handler {
 	log.Println(mux)
 
 	//middleware
-	pc := controllers.NewPlayerController(c.ElasticSearch, c.MongoDB, c.Kafka.Cache)
+	pc := controllers.NewPlayerController(c.ElasticSearch, c.MongoDB, c.TLS, c.Kafka.Cache)
 	//routes
 	//mux.Get("/search/{platform}/{player}", pc.GetPlayers)
 	//mux.Get("/player/{platform}/{id}", pc.Player)
