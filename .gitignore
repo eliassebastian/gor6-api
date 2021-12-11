@@ -15,5 +15,7 @@
 # vendor/
 
 #IDE
-.idea
-.cert
+.idea/
+
+#cert file
+cert/
