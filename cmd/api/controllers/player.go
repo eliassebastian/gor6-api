@@ -114,8 +114,8 @@ func (pc *PlayerController) fetchGeneralStats(ctx context.Context, n, p string) 
 	return nil, nil
 }
 
-func (pc *PlayerController) fetchPlayerPlaytime(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=%s&spaceId=%s&statNames=PPvPtimeplayed", id, getSpaceId(p))
+func (pc *PlayerController) fetchPlayerPlayTimeLevel(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=%s&spaceId=%s&statNames=PPvPTimePlayed,PClearanceLevel", id, getSpaceId(p))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player level 1")
@@ -132,45 +132,18 @@ func (pc *PlayerController) fetchPlayerPlaytime(ctx context.Context, wg *sync.Wa
 	}
 	defer res.Body.Close()
 
-	var time models.TimePlayedModel
-	de := json.NewDecoder(res.Body).Decode(&time)
+	log.Println()
+
+	var tm models.TimeAndLevelModel
+	de := json.NewDecoder(res.Body).Decode(&tm)
 	if de != nil {
 		log.Println("error fetching player level 3")
 		wg.Done()
 		return
 	}
-
-	player.TimePlayed = time.Profiles[0].Stats.TimePlayed
-	wg.Done()
-}
-
-func (pc *PlayerController) fetchPlayerLevel(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=%s&spaceId=%s&statNames=PClearanceLevel", id, getSpaceId(p))
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		log.Println("error fetching player level 1")
-		wg.Done()
-		return
-	}
-
-	req.Header = pc.getHeader()
-	res, _ := pc.hc.Do(req)
-	if res.StatusCode != 200 {
-		log.Println("error fetching player level 2")
-		wg.Done()
-		return
-	}
-	defer res.Body.Close()
-
-	var level models.LevelModel
-	de := json.NewDecoder(res.Body).Decode(&level)
-	if de != nil {
-		log.Println("error fetching player level 3")
-		wg.Done()
-		return
-	}
-
-	player.Level = level.Profiles[0].Stats.LevelO
+	log.Println(tm)
+	player.Level = tm.Profiles[0].StatsO.LevelO
+	player.TimePlayed = tm.Profiles[0].StatsO.TimePlayedO
 	wg.Done()
 }
 
@@ -217,10 +190,11 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 		NickName:  res.NameOnPlatform,
 	}
 	//if found, put in cache
-	wg.Add(2)
+	wg.Add(1)
 	//return to request
-	go pc.fetchPlayerLevel(ctx, wg, player, res.IDOnPlatform, p)
-	go pc.fetchPlayerPlaytime(ctx, wg, player, res.IDOnPlatform, p)
+	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.IDOnPlatform, p)
+	//go pc.fetchPlayerLevel(ctx, wg, player, res.IDOnPlatform, p)
+	//go pc.fetchPlayerPlaytime(ctx, wg, player, res.IDOnPlatform, p)
 
 	wg.Wait()
 
