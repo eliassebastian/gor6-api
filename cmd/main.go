@@ -3,12 +3,9 @@ package main
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
 	"github.com/eliassebastian/gor6-api/internal/mongodb"
 	"github.com/eliassebastian/gor6-api/internal/pubsub"
-	"golang.org/x/net/http2"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -29,13 +26,13 @@ func main() {
 }
 
 func run() (<-chan error, error) {
-	/*
-		cert, err := tls.LoadX509KeyPair("./cert/client.pem", "./cert/client.key")
-		if err != nil {
-			log.Printf(":: %v", cert)
-			return nil, err
-		}
+	cert, err := tls.LoadX509KeyPair("./cert/localhost-client.pem", "./cert/localhost-client-key.pem")
+	if err != nil {
+		log.Printf(":: %v", cert)
+		return nil, err
+	}
 
+	/*
 		caCert, err := ioutil.ReadFile("./cert/ExampleCA.pem")
 		if err != nil {
 			log.Printf("error %v", caCert)
@@ -62,10 +59,10 @@ func run() (<-chan error, error) {
 		MongoDB:       mc,
 		ElasticSearch: es,
 		Kafka:         kc,
-		//TLS: &tls.Config{
-		//	Certificates: []tls.Certificate{cert},
-		//	RootCAs:      caCertPool,
-		//},
+		TLS: &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			//RootCAs:      caCertPool,
+		},
 	})
 
 	errC := make(chan error, 1)
@@ -102,8 +99,8 @@ func run() (<-chan error, error) {
 	go kc.Run(ctx)
 
 	go func() {
-		http2Server := http2.Server{}
-		_ = http2.ConfigureServer(srv, &http2Server)
+		//http2Server := http2.Server{}
+		//_ = http2.ConfigureServer(srv, &http2Server)
 		log.Println("Server Listen And Serve")
 		if err := srv.ListenAndServeTLS("./cert/localhost.pem", "./cert/localhost-key.pem"); err != nil {
 			errC <- err
@@ -121,32 +118,37 @@ type serverConfig struct {
 	TLS           *tls.Config
 }
 
-func getTLSConfig(host string, certOpt tls.ClientAuthType) *tls.Config {
-	caCert, err := ioutil.ReadFile("/Users/eliasschmoelz/Library/Application Support/mkcert/rootCA.pem")
+func getTLSConfig() *tls.Config {
+	//caCert, err := ioutil.ReadFile("/Users/eliasschmoelz/Library/Application Support/mkcert/rootCA.pem")
+	//if err != nil {
+	//	log.Fatal("Error opening cert file", ", error ", err)
+	//}
+	//caCertPool := x509.NewCertPool()
+	//caCertPool.AppendCertsFromPEM(caCert)
+	cert, err := tls.LoadX509KeyPair("./cert/localhost.pem", "./cert/localhost-key.pem")
 	if err != nil {
-		log.Fatal("Error opening cert file", ", error ", err)
+		log.Fatalln(err)
 	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-
 	return &tls.Config{
-		ServerName: host,
+		//ServerName: host,
 		// ClientAuth: tls.NoClientCert,				// Client certificate will not be requested and it is not required
 		// ClientAuth: tls.RequestClientCert,			// Client certificate will be requested, but it is not required
 		// ClientAuth: tls.RequireAnyClientCert,		// Client certificate is required, but any client certificate is acceptable
 		// ClientAuth: tls.VerifyClientCertIfGiven,		// Client certificate will be requested and if present must be in the server's Certificate Pool
 		// ClientAuth: tls.RequireAndVerifyClientCert,	// Client certificate will be required and must be present in the server's Certificate Pool
-		ClientAuth: certOpt,
-		ClientCAs:  caCertPool,
-		MinVersion: tls.VersionTLS12, // TLS versions below 1.2 are considered insecure - see https://www.rfc-editor.org/rfc/rfc7525.txt for details
+		//ClientAuth: certOpt,
+		//ClientCAs:  caCertPool,
+		//NextProtos:   []string{"h2"},
+		Certificates: []tls.Certificate{cert},
+		MinVersion:   tls.VersionTLS12, // TLS versions below 1.2 are considered insecure - see https://www.rfc-editor.org/rfc/rfc7525.txt for details
 	}
 }
 
 func newServer(c serverConfig) (*http.Server, error) {
 	return &http.Server{
-		Addr:    ":8090",
-		Handler: routes(c),
-		//TLSConfig:    getTLSConfig("localhost", 4),
+		Addr:         ":8090",
+		Handler:      routes(c),
+		TLSConfig:    getTLSConfig(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,

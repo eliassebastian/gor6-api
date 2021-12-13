@@ -4,13 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
 	"github.com/eliassebastian/gor6-api/internal/mongodb"
 	"github.com/go-chi/chi/v5"
-	"golang.org/x/net/http2"
 	"log"
 	"net/http"
 	"strings"
@@ -25,14 +23,17 @@ type PlayerController struct {
 	hc *http.Client
 }
 
-func NewPlayerController(c *elastic.ESClient, m *mongodb.MongoClient, tls *tls.Config, p *sync.Map) *PlayerController {
+func NewPlayerController(c *elastic.ESClient, m *mongodb.MongoClient, tlsc *tls.Config, p *sync.Map) *PlayerController {
 	return &PlayerController{
 		ec: c,
 		mc: m,
 		sm: p,
 		hc: &http.Client{
-			Timeout:   10 * time.Second,
-			Transport: &http2.Transport{},
+			Timeout: 10 * time.Second,
+			//Transport: &http.Transport{
+			//	ForceAttemptHTTP2: true,
+			//	TLSClientConfig:   tlsc,
+			//},
 		},
 	}
 }
@@ -51,7 +52,7 @@ func (pc *PlayerController) getHeader() http.Header {
 	return http.Header{
 		"Authorization": []string{fmt.Sprintf("Ubi_v1 t=%s", re["ticket"])},
 		"Ubi-AppId":     []string{"39baebad-39e5-4552-8c25-2c9b919064e2"},
-		"Ubi-SessionId": []string{re["sessionKey"]},
+		"Ubi-SessionId": []string{re["sessionId"]},
 		"Connection":    []string{"keep-alive"},
 	}
 }
@@ -69,38 +70,34 @@ func genExpiration() string {
 }
 
 func (pc *PlayerController) fetchGeneralStats(ctx context.Context, n, p string) (interface{}, error) {
-	//var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel", "PPvPmatchplayed", "PPvPmatchwon", "PPvPmatchlost", "PPvPkills", "PPvPdeath"}[:], ",")
-	//var stats = strings.Join([]string{"PPvPtimeplayed"}[:], ",")
-	log.Println(p, getSpaceId(p))
-	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=%s&statNames=%s", getSpaceId(p), "PPvPTimePlayed")
+	var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel", "PPvPmatchplayed", "PPvPmatchwon", "PPvPmatchlost", "PPvPkills", "PPvPdeath"}[:], ",")
+	//var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel"}[:], ",")
+	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=%s&statNames=%s", getSpaceId(p), stats)
 	//url2 := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/spaces/%s/sandboxes/%s/playerstats2/statistics?populations=%s&statistics=%s", getSpaceId(p), getPlatformURL(p), "ab1ff7ae-13e4-4a6a-9b03-317285f8057b", "PPvPtimeplayed")
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
-	log.Println("new request")
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("Session Key")
 	sd, ok := pc.sm.Load("session")
 	if !ok {
 		return nil, nil
 	}
 
-	log.Println("Assertion")
 	re, ok := sd.(map[string]string)
 	if !ok {
 		return nil, nil
 	}
 
-	log.Println("Header")
-
+	//req.Proto = "h2"
+	//req.Method = http.MethodGet
 	req.Header = http.Header{
 		//experimenting with same headers as on ubi website for same request
-		":method":         []string{"GET"},
-		":scheme":         []string{"https"},
-		":authority":      []string{"public-ubiservices.ubi.com"},
-		":path":           []string{fmt.Sprintf("/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=5172a557-50b5-4665-b7db-e3f2e8c5041d&statNames=PPvPTimePlayed")},
+		//":method": []string{"GET"},
+		//":scheme":         []string{"https"},
+		//":authority":      []string{"public-ubiservices.ubi.com"},
+		//":path":           []string{fmt.Sprintf("/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=5172a557-50b5-4665-b7db-e3f2e8c5041d&statNames=PPvPTimePlayed")},
 		"Accept":          []string{"*/*"},
 		"Accept-Language": []string{"en-GB,en;q=0.9"},
 		"Accept-Encoding": []string{"gzip", "deflate", "br"},
@@ -109,15 +106,21 @@ func (pc *PlayerController) fetchGeneralStats(ctx context.Context, n, p string) 
 		"Origin":          []string{"https://www.ubisoft.com"},
 		"User-Agent":      []string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15"},
 		"Ubi-AppId":       []string{"3587dcbb-7f81-457c-9781-0e3f29f6f56a"},
-		"Ubi-SessionId":   []string{re["sessionKey"]},
-		"content-type":    []string{"application/json"},
-		"Connection":      []string{"keep-alive"},
-		"Referer":         []string{"https://www.ubisoft.com/"},
-		"expiration":      []string{genExpiration()},
+		"Ubi-SessionId":   []string{re["sessionId"]},
+		//"content-type":    []string{"application/json"},
+		"Connection": []string{"keep-alive"},
+		//"Referer":         []string{"https://www.ubisoft.com/"},
+		"expiration": []string{genExpiration()},
 	}
+	//fmt.Println(req)
+	//fmt.Println(req.Header)
 	log.Print("HC DO")
+	//res, err := pc.hc.RoundTrip(req)
 	res, err := pc.hc.Do(req)
-	fmt.Println(res, res.ProtoMajor, err)
+	if err != nil {
+		return nil, err
+	}
+	//fmt.Println(res.Request, res.ProtoMajor, err)
 	if res.StatusCode != 200 {
 		log.Println("Error with Client Request", res.Status)
 		return nil, err
@@ -129,6 +132,7 @@ func (pc *PlayerController) fetchGeneralStats(ctx context.Context, n, p string) 
 	return nil, nil
 }
 
+/*
 func (pc *PlayerController) fetchProfileId(ctx context.Context, n, p string) (*models.PlayerProfile, error) {
 	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v3/profiles?namesOnPlatform=%s&platformType=%s", n, p)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -149,7 +153,7 @@ func (pc *PlayerController) fetchProfileId(ctx context.Context, n, p string) (*m
 	}
 	res.Body.Close()
 	return &player.Profiles[0], nil
-}
+}*/
 
 func (pc *PlayerController) fetchPlayer(ctx context.Context, n, p string) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second) //change to deadline?
@@ -160,25 +164,35 @@ func (pc *PlayerController) fetchPlayer(ctx context.Context, n, p string) ([]byt
 	//return to request
 
 	//if not found check for profileId
-	profileId, err := pc.fetchProfileId(ctx, n, p)
+	//profileId, errf := pc.fetchProfileId(ctx, n, p)
+	//if errf != nil {
+	//	log.Println(errf)
+	//	return []byte("empty"), errf
+	//}
 
 	//player stats
-	res, reserr := pc.fetchGeneralStats(ctx, n, p)
-	log.Println(res, reserr)
+	res, err := pc.fetchGeneralStats(ctx, n, p)
+	if err != nil {
+		log.Println(err)
+		return []byte(""), err
+	}
+	log.Println(res)
 	//seasonal stats
-
 	//operator stats
-
 	//weapon stats
-
-	//return []byte(profileId.ProfileID), err
-	return []byte(profileId.ProfileID), err
+	return []byte("success"), nil
+	//return []byte(profileId.ProfileID), nil
 }
 
 func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 	platform := strings.ToLower(chi.URLParam(r, "platform"))
 	player := strings.ToLower(chi.URLParam(r, "player"))
-	res, _ := pc.fetchPlayer(r.Context(), player, platform)
+	res, err := pc.fetchPlayer(r.Context(), player, platform)
+	if err != nil {
+		log.Println(err)
+		w.Write([]byte("check logs error"))
+		return
+	}
 	w.Write(res)
 }
 
