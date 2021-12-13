@@ -8,7 +8,7 @@ type Level struct {
 }
 
 type LevelStats struct {
-	Level `json:"PClearanceLevel"`
+	LevelO Level `json:"PClearanceLevel"`
 }
 
 type LevelProfiles struct {
