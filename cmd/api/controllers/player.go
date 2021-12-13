@@ -210,6 +210,7 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 	platform := strings.ToLower(chi.URLParam(r, "platform"))
 	player := strings.ToLower(chi.URLParam(r, "player"))
+	startTime := time.Now()
 
 	s, _, err := pc.searchForPlayer(r.Context(), player, platform)
 	if s {
@@ -225,9 +226,9 @@ func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 
 	res, err := pc.fetchNewPlayer(r.Context(), player, platform)
 	if err != nil {
-		util.ErrorJSON(w, http.StatusNotFound, err.Error())
+		util.ErrorJSON(w, startTime, http.StatusNotFound, err.Error())
 		return
 	}
 
-	util.ReturnJSON(w, http.StatusOK, "OK", res)
+	util.ReturnJSON(w, startTime, http.StatusOK, "OK", res)
 }
