@@ -20,7 +20,7 @@ func ReturnJSON(w http.ResponseWriter, start time.Time, status int, m string, da
 		Code:      status,
 		Message:   m,
 		Timestamp: time.Now(),
-		Duration:  time.Now().Sub(start),
+		Duration:  (time.Now().Sub(start)) / time.Second,
 		Error:     data == nil,
 		Payload:   data,
 	}
