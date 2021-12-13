@@ -69,6 +69,10 @@ func genExpiration() string {
 	return (time.Now().Add(1 * time.Hour)).String()
 }
 
+//fetch level
+
+//fetch playtime
+
 func (pc *PlayerController) fetchGeneralStats(ctx context.Context, n, p string) (interface{}, error) {
 	var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel", "PPvPmatchplayed", "PPvPmatchwon", "PPvPmatchlost", "PPvPkills", "PPvPdeath"}[:], ",")
 	//var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel"}[:], ",")
