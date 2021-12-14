@@ -1,7 +1,7 @@
 package models
 
 type PlayerProfile struct {
-	//ProfileID string `json:"profileId"`
+	ProfileID string `json:"profileId"`
 	//UserID         string `json:"userId"`
 	PlatformType   string `json:"platformType"`
 	IDOnPlatform   string `json:"idOnPlatform"`

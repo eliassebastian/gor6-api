@@ -86,32 +86,53 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 	return false, nil, nil
 }
 
-func (pc *PlayerController) fetchGeneralStats(ctx context.Context, n, p string) (interface{}, error) {
-	var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel", "PPvPmatchplayed", "PPvPmatchwon", "PPvPmatchlost", "PPvPkills", "PPvPdeath"}[:], ",")
-	//var stats = strings.Join([]string{"PPvPtimeplayed", "PClearanceLevel"}[:], ",")
-	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=%s&statNames=%s", getSpaceId(p), stats)
-	//url2 := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/spaces/%s/sandboxes/%s/playerstats2/statistics?populations=%s&statistics=%s", getSpaceId(p), getPlatformURL(p), "ab1ff7ae-13e4-4a6a-9b03-317285f8057b", "PPvPtimeplayed")
+func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/seasonal/summary/%s?gameMode=all,ranked,casual,unranked&platform=%s", id, models.PlatformURLNames2[p])
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-
 	if err != nil {
-		return nil, err
+		log.Println("error fetching player summary 1")
+		wg.Done()
+		return
 	}
-
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		return nil, err
+		log.Println("error fetching player summary 2")
+		wg.Done()
+		return
 	}
 
+	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Println("Error with Client Request", res.Status)
-		return nil, err
+		log.Println("error fetching player summary 3")
+		wg.Done()
+		return
 	}
-	var output map[string]interface{}
-	json.NewDecoder(res.Body).Decode(&output)
-	fmt.Println(output)
-	res.Body.Close()
-	return nil, nil
+
+	var sm models.SummaryModel
+	de := json.NewDecoder(res.Body).Decode(&sm)
+	if de != nil {
+		log.Println("error fetching player level 5")
+		wg.Done()
+		return
+	}
+	//log.Println(tm)
+	var sl models.SummaryPlatform
+	switch p {
+	case "uplay":
+		sl = sm.Platforms.SPc
+	case "psn":
+		sl = sm.Platforms.SPs
+	case "xbl":
+		sl = sm.Platforms.SXbox
+	default:
+		log.Println("error fetching player level 5")
+		wg.Done()
+		return
+	}
+
+	player.Summary = sl.SGameModes
+	wg.Done()
 }
 
 func (pc *PlayerController) fetchPlayerPlayTimeLevel(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
@@ -124,24 +145,29 @@ func (pc *PlayerController) fetchPlayerPlayTimeLevel(ctx context.Context, wg *sy
 	}
 
 	req.Header = pc.getHeader()
-	res, _ := pc.hc.Do(req)
-	if res.StatusCode != 200 {
-		log.Println("error fetching player level 2")
-		wg.Done()
-		return
-	}
-	defer res.Body.Close()
-
-	log.Println()
-
-	var tm models.TimeAndLevelModel
-	de := json.NewDecoder(res.Body).Decode(&tm)
-	if de != nil {
+	res, err := pc.hc.Do(req)
+	if err != nil {
 		log.Println("error fetching player level 3")
 		wg.Done()
 		return
 	}
-	log.Println(tm)
+
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		log.Println("error fetching player level 4")
+		wg.Done()
+		return
+	}
+
+	var tm models.TimeAndLevelModel
+	de := json.NewDecoder(res.Body).Decode(&tm)
+	if de != nil {
+		log.Println("error fetching player level 5")
+		wg.Done()
+		return
+	}
+	//log.Println(tm)
 	player.Level = tm.Profiles[0].StatsO.LevelO
 	player.TimePlayed = tm.Profiles[0].StatsO.TimePlayedO
 	wg.Done()
@@ -185,14 +211,17 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 	//TODO create channel for communication between goroutines
 	wg := &sync.WaitGroup{}
 	player := &models.PlayerFullProfile{
-		ProfileID: res.IDOnPlatform,
-		Platform:  res.PlatformType,
-		NickName:  res.NameOnPlatform,
+		ProfileID:  res.ProfileID,
+		PlatformID: res.IDOnPlatform,
+		Platform:   res.PlatformType,
+		NickName:   res.NameOnPlatform,
+		LastUpdate: time.Now().UTC(),
 	}
 	//if found, put in cache
-	wg.Add(1)
+	wg.Add(2)
 	//return to request
-	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.IDOnPlatform, p)
+	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
+	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerLevel(ctx, wg, player, res.IDOnPlatform, p)
 	//go pc.fetchPlayerPlaytime(ctx, wg, player, res.IDOnPlatform, p)
 
