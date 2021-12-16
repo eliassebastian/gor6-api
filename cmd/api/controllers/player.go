@@ -50,16 +50,12 @@ func (pc *PlayerController) getHeader() http.Header {
 		return nil
 	}
 	return http.Header{
-		"Accept": []string{"*/*"},
-		//"Accept-Language": []string{"en-GB,en;q=0.9"},
-		//"Accept-Encoding": []string{"gzip", "deflate", "br"},
-		"Authorization": []string{fmt.Sprintf("ubi_v1 t=%s", re["ticket"])},
-		//"Host":            []string{"public-ubiservices.ubi.com"},
-		//"Origin":          []string{"https://www.ubisoft.com"},
-		"User-Agent":    []string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15"},
-		"Ubi-AppId":     []string{"3587dcbb-7f81-457c-9781-0e3f29f6f56a"},
-		"Ubi-SessionId": []string{re["sessionId"]},
-		"Connection":    []string{"keep-alive"},
+		"authorization": []string{fmt.Sprintf("ubi_v1 t=%s", re["ticket"])},
+		"Origin":        []string{"https://www.ubisoft.com"},
+		"content-type":  []string{"application/json"},
+		"user-agent":    []string{"node.js"},
+		"ubi-appid":     []string{"3587dcbb-7f81-457c-9781-0e3f29f6f56a"},
+		"ubi-sessionid": []string{re["sessionId"]},
 		"expiration":    []string{genExpiration()},
 	}
 }
@@ -73,7 +69,13 @@ func getPlatformURL(p string) string {
 }
 
 func genExpiration() string {
-	return (time.Now().Add(1 * time.Hour)).String()
+	javascriptISOString := "2006-01-02T15:04:05.999Z07:00"
+	return time.Now().UTC().Add(10 * time.Minute).Format(javascriptISOString)
+}
+
+func getDate() string {
+	year, month, day := time.Now().Date()
+	return fmt.Sprintf("%v%02d%02d", year, int(month), day)
 }
 
 func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (bool, interface{}, error) {
@@ -86,7 +88,114 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 	return false, nil, nil
 }
 
+func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	fmt.Println(id, p)
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20210813&endDate=20211211", id, models.PlatformURLNames2[p])
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		log.Println("error fetching player summary specific 1")
+		wg.Done()
+		return
+	}
+	req.Header = pc.getHeader()
+	res, err := pc.hc.Do(req)
+	if err != nil {
+		log.Println("error fetching player summary specific 2", err)
+		wg.Done()
+		return
+	}
+
+	fmt.Print("Maps:", res)
+	wg.Done()
+}
+
+func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	fmt.Println(id, p)
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all&startDate=20210811&endDate=20211209", id, models.PlatformURLNames2[p])
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		log.Println("error fetching player summary specific 1")
+		wg.Done()
+		return
+	}
+	req.Header = pc.getHeader()
+	res, err := pc.hc.Do(req)
+	if err != nil {
+		log.Println("error fetching player summary specific 2", err)
+		wg.Done()
+		return
+	}
+
+	fmt.Print("Weapons:", res)
+	wg.Done()
+}
+
+func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	fmt.Println(id, p)
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20210811&endDate=%s", id, models.PlatformURLNames2[p], getDate())
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		log.Println("error fetching player summary specific 1", err)
+		wg.Done()
+		return
+	}
+	req.Header = pc.getHeader()
+	res, err := pc.hc.Do(req)
+	if err != nil {
+		log.Println("error fetching player summary specific 2", err)
+		wg.Done()
+		return
+	}
+
+	fmt.Print("Operators:", res)
+	wg.Done()
+}
+
+func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	fmt.Println(id, p)
+	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/spaces/%s/sandboxes/%s/r6karma/player_skill_records?board_ids=pvp_ranked&season_ids=-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-23,-24&region_ids=ncsa&profile_ids=%s", getSpaceId(p), getPlatformURL(p), id)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		log.Println("error fetching player ranked 1")
+		wg.Done()
+		return
+	}
+	req.Header = pc.getHeader()
+	res, err := pc.hc.Do(req)
+	fmt.Println(res.Request.Header)
+	if err != nil {
+		fmt.Println("error fetching player ranked 2", err)
+		wg.Done()
+		return
+	}
+
+	fmt.Print("Ranked:", res)
+	wg.Done()
+}
+
+func (pc *PlayerController) fetchPlayerSummarySpecific(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	fmt.Println(id, p)
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/summary/%s?gameMode=all,ranked,unranked,casual&platform=%s&startDate=20210811&endDate=20211214", id, models.PlatformURLNames2[p])
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		log.Println("error fetching player summary specific 1")
+		wg.Done()
+		return
+	}
+	req.Header = pc.getHeader()
+	res, err := pc.hc.Do(req)
+	if err != nil {
+		fmt.Println("error fetching player summary specific 2", err)
+		wg.Done()
+		return
+	}
+
+	fmt.Print("Specific:", res)
+	wg.Done()
+}
+
 func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
+	fmt.Println(id, p)
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/seasonal/summary/%s?gameMode=all,ranked,casual,unranked&platform=%s", id, models.PlatformURLNames2[p])
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -103,8 +212,9 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.Wai
 	}
 
 	defer res.Body.Close()
+	fmt.Println("Summary:", res)
 	if res.StatusCode != 200 {
-		log.Println("error fetching player summary 3")
+		fmt.Println("error fetching player summary 3", res.Status)
 		wg.Done()
 		return
 	}
@@ -112,7 +222,7 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.Wai
 	var sm models.SummaryModel
 	de := json.NewDecoder(res.Body).Decode(&sm)
 	if de != nil {
-		log.Println("error fetching player level 5")
+		log.Println("error fetching player level 5", de)
 		wg.Done()
 		return
 	}
@@ -222,9 +332,13 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 	//return to request
 	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
+	//go pc.fetchPlayerSummarySpecific(ctx, wg, player, res.ProfileID, p)
+	//go pc.fetchPlayerRanked(ctx, wg, player, res.ProfileID, p)
+	//go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
+	//go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
+	//go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerLevel(ctx, wg, player, res.IDOnPlatform, p)
 	//go pc.fetchPlayerPlaytime(ctx, wg, player, res.IDOnPlatform, p)
-
 	wg.Wait()
 
 	select {
