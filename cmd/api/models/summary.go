@@ -38,27 +38,15 @@ type SummaryTeamRoles struct {
 	All []SummarySeason `json:"all"`
 }
 
-type SummaryCasual struct {
-	TeamRoles SummaryTeamRoles `json:"teamRoles"`
-}
-
-type SummaryRanked struct {
-	TeamRoles SummaryTeamRoles `json:"teamRoles"`
-}
-
-type SummaryUnranked struct {
-	TeamRoles SummaryTeamRoles `json:"teamRoles"`
-}
-
-type SummaryAll struct {
+type SummaryGameMode struct {
 	TeamRoles SummaryTeamRoles `json:"teamRoles"`
 }
 
 type SummaryGameModes struct {
-	Casual   SummaryCasual   `json:"casual"`
-	Ranked   SummaryRanked   `json:"ranked"`
-	Unranked SummaryUnranked `json:"unranked"`
-	All      SummaryAll      `json:"all"`
+	Casual   SummaryGameMode `json:"casual"`
+	Ranked   SummaryGameMode `json:"ranked"`
+	Unranked SummaryGameMode `json:"unranked"`
+	All      SummaryGameMode `json:"all"`
 }
 
 type SummaryPlatform struct {

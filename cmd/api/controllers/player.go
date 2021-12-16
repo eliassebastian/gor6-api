@@ -74,8 +74,10 @@ func genExpiration() string {
 }
 
 func getDate() string {
-	year, month, day := time.Now().Date()
-	return fmt.Sprintf("%v%02d%02d", year, int(month), day)
+	year, month, day := time.Now().AddDate(0, 0, -1).Date()
+	s := fmt.Sprintf("%v%02d%02d", year, int(month), day)
+	fmt.Println("Date:", s)
+	return s
 }
 
 func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (bool, interface{}, error) {
@@ -110,23 +112,53 @@ func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGr
 }
 
 func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	fmt.Println(id, p)
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all&startDate=20210811&endDate=20211209", id, models.PlatformURLNames2[p])
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all&platform=%s&teamRole=all&startDate=20160101&endDate=%s", id, models.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player summary specific 1")
+		log.Println("error fetching player weapon specific 1")
 		wg.Done()
 		return
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player summary specific 2", err)
+		log.Println("error fetching player weapon 2", err)
 		wg.Done()
 		return
 	}
 
-	fmt.Print("Weapons:", res)
+	defer res.Body.Close()
+	fmt.Println("Summary:", res)
+	if res.StatusCode != 200 {
+		fmt.Println("error fetching player weapon 3", res.Status)
+		wg.Done()
+		return
+	}
+
+	var wm models.WeaponsModel
+	de := json.NewDecoder(res.Body).Decode(&wm)
+	if de != nil {
+		log.Println("error fetching player weapon 5", de)
+		wg.Done()
+		return
+	}
+
+	var wl models.WeaponsPlatform
+	switch p {
+	case "uplay":
+		wl = wm.Platforms.Pc
+	case "psn":
+		wl = wm.Platforms.Ps4
+	case "xbl":
+		wl = wm.Platforms.Xbox
+	default:
+		log.Println("error fetching player level 5")
+		wg.Done()
+		return
+	}
+
+	player.Weapons = wl.GameModes
+	fmt.Println("weapons done")
 	wg.Done()
 }
 
@@ -328,14 +360,14 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 		LastUpdate: time.Now().UTC(),
 	}
 	//if found, put in cache
-	wg.Add(2)
+	wg.Add(3)
 	//return to request
 	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerSummarySpecific(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerRanked(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
-	//go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
+	go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerLevel(ctx, wg, player, res.IDOnPlatform, p)
 	//go pc.fetchPlayerPlaytime(ctx, wg, player, res.IDOnPlatform, p)
