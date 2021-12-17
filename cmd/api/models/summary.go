@@ -11,21 +11,21 @@ type SummaryModel struct {
 }
 
 type SummarySeason struct {
-	SeasonYear        string  `json:"seasonYear"`
-	SeasonNumber      string  `json:"seasonNumber"`
-	MatchesPlayed     int     `json:"matchesPlayed"`
-	RoundsPlayed      int     `json:"roundsPlayed"`
-	MinutesPlayed     int     `json:"minutesPlayed"`
-	MatchesWon        int     `json:"matchesWon"`
-	MatchesLost       int     `json:"matchesLost"`
-	RoundsWon         int     `json:"roundsWon"`
-	RoundsLost        int     `json:"roundsLost"`
-	Kills             int     `json:"kills"`
-	Assists           int     `json:"assists"`
-	Death             int     `json:"death"`
-	Headshots         int     `json:"headshots"`
-	MeleeKills        int     `json:"meleeKills"`
-	TeamKills         int     `json:"teamKills"`
+	SeasonYear    string `json:"seasonYear"`
+	SeasonNumber  string `json:"seasonNumber"`
+	MatchesPlayed int    `json:"matchesPlayed"`
+	RoundsPlayed  int    `json:"roundsPlayed"`
+	MinutesPlayed int    `json:"minutesPlayed"`
+	MatchesWon    int    `json:"matchesWon"`
+	MatchesLost   int    `json:"matchesLost"`
+	RoundsWon     int    `json:"roundsWon"`
+	RoundsLost    int    `json:"roundsLost"`
+	Kills         int    `json:"kills"`
+	Assists       int    `json:"assists"`
+	Death         int    `json:"death"`
+	Headshots     int    `json:"headshots"`
+	MeleeKills    int    `json:"meleeKills"`
+	//TeamKills         int     `json:"teamKills"`
 	OpeningKills      int     `json:"openingKills"`
 	OpeningDeaths     int     `json:"openingDeaths"`
 	Trades            int     `json:"trades"`

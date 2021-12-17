@@ -241,8 +241,7 @@ func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.W
 }
 
 func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	fmt.Println(id, p)
-	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/spaces/%s/sandboxes/%s/r6karma/player_skill_records?board_ids=pvp_ranked&season_ids=-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-23,-24&region_ids=ncsa&profile_ids=%s", getSpaceId(p), getPlatformURL(p), id)
+	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/spaces/%s/sandboxes/%s/r6karma/player_skill_records?board_ids=pvp_ranked&season_ids=-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19&region_ids=ncsa&profile_ids=%s", getSpaceId(p), getPlatformURL(p), id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player ranked 1")
@@ -258,7 +257,27 @@ func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, wg *sync.Wait
 		return
 	}
 
-	fmt.Print("Ranked:", res)
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		fmt.Println("error fetching player summary 3", res.Status)
+		wg.Done()
+		return
+	}
+
+	var m models.RankedModel
+	de := json.NewDecoder(res.Body).Decode(&m)
+	if de != nil {
+		log.Println("error fetching player level 5", de)
+		wg.Done()
+		return
+	}
+
+	var seasons []models.RankedSeason
+	for _, season := range m.SeasonsPlayerSkillRecords {
+		seasons = append(seasons, season.RegionsPlayerSkillRecords[0].BoardsPlayerSkillRecords[0].Seasons[0])
+	}
+
+	player.Ranked = seasons
 	wg.Done()
 }
 
@@ -284,7 +303,6 @@ func (pc *PlayerController) fetchPlayerSummarySpecific(ctx context.Context, wg *
 }
 
 func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	fmt.Println(id, p)
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/seasonal/summary/%s?gameMode=all,ranked,casual,unranked&platform=%s", id, models.PlatformURLNames2[p])
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -301,7 +319,6 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.Wai
 	}
 
 	defer res.Body.Close()
-	fmt.Println("Summary:", res)
 	if res.StatusCode != 200 {
 		fmt.Println("error fetching player summary 3", res.Status)
 		wg.Done()
@@ -417,12 +434,12 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 		LastUpdate: time.Now().UTC(),
 	}
 	//if found, put in cache
-	wg.Add(5)
+	wg.Add(6)
 	//return to request
 	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerSummarySpecific(ctx, wg, player, res.ProfileID, p)
-	//go pc.fetchPlayerRanked(ctx, wg, player, res.ProfileID, p)
+	go pc.fetchPlayerRanked(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)

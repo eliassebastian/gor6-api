@@ -10,10 +10,11 @@ type PlayerFullProfile struct {
 	LastUpdate time.Time         `json:"lastUpdate"`
 	TimePlayed TimePlayed        `json:"timePlayed"`
 	Level      Level             `json:"level"`
-	Summary    SummaryGameModes  `json:"summary"`
-	Weapons    WeaponsGameModes  `json:"weapons"`
-	Operators  OperatorGameModes `json:"operators"`
-	Maps       MapsGameModes     `json:"maps"`
+	Summary    SummaryGameModes  `json:"summary,omitempty"`
+	Ranked     []RankedSeason    `json:"ranked,omitempty"`
+	Weapons    WeaponsGameModes  `json:"weapons,omitempty"`
+	Operators  OperatorGameModes `json:"operators,omitempty"`
+	Maps       MapsGameModes     `json:"maps,omitempty"`
 	//PlayerProfile
 	//Level https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=5172a557-50b5-4665-b7db-e3f2e8c5041d&statNames=PClearanceLevel
 	//Playtime https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=5172a557-50b5-4665-b7db-e3f2e8c5041d&statNames=PPvPTimePlayed
