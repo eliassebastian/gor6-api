@@ -69,8 +69,8 @@ func getPlatformURL(p string) string {
 }
 
 func genExpiration() string {
-	javascriptISOString := "2006-01-02T15:04:05.999Z07:00"
-	return time.Now().UTC().Add(10 * time.Minute).Format(javascriptISOString)
+	//add 10 minutes to current date+time
+	return time.Now().UTC().Add(10 * time.Minute).Format("2006-01-02T15:04:05.999Z07:00")
 }
 
 func getDate() string {
@@ -91,22 +91,51 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 }
 
 func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20210813&endDate=%s", id, models.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, models.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player summary specific 1")
+		log.Println("error fetching player map 1")
 		wg.Done()
 		return
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player summary specific 2", err)
+		log.Println("error fetching player map 2", err)
 		wg.Done()
 		return
 	}
 
-	fmt.Print("Maps:", res)
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		fmt.Println("error fetching player map 3", res.Status)
+		wg.Done()
+		return
+	}
+
+	var m models.MapsModel
+	de := json.NewDecoder(res.Body).Decode(&m)
+	if de != nil {
+		log.Println("error fetching player map 4", de)
+		wg.Done()
+		return
+	}
+
+	var wl models.MapsPlatform
+	switch p {
+	case "uplay":
+		wl = m.Platforms.Pc
+	case "psn":
+		wl = m.Platforms.Ps4
+	case "xbl":
+		wl = m.Platforms.Xbox
+	default:
+		log.Println("error fetching player map 5")
+		wg.Done()
+		return
+	}
+
+	player.Maps = wl.GameModes
 	wg.Done()
 }
 
@@ -388,17 +417,15 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 		LastUpdate: time.Now().UTC(),
 	}
 	//if found, put in cache
-	wg.Add(3)
+	wg.Add(5)
 	//return to request
 	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerSummarySpecific(ctx, wg, player, res.ProfileID, p)
 	//go pc.fetchPlayerRanked(ctx, wg, player, res.ProfileID, p)
-	//go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
+	go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
-	//go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)
-	//go pc.fetchPlayerLevel(ctx, wg, player, res.IDOnPlatform, p)
-	//go pc.fetchPlayerPlaytime(ctx, wg, player, res.IDOnPlatform, p)
+	go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)
 	wg.Wait()
 
 	select {

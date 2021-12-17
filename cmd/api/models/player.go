@@ -13,6 +13,7 @@ type PlayerFullProfile struct {
 	Summary    SummaryGameModes  `json:"summary"`
 	Weapons    WeaponsGameModes  `json:"weapons"`
 	Operators  OperatorGameModes `json:"operators"`
+	Maps       MapsGameModes     `json:"maps"`
 	//PlayerProfile
 	//Level https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=5172a557-50b5-4665-b7db-e3f2e8c5041d&statNames=PClearanceLevel
 	//Playtime https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=ab1ff7ae-13e4-4a6a-9b03-317285f8057b&spaceId=5172a557-50b5-4665-b7db-e3f2e8c5041d&statNames=PPvPTimePlayed

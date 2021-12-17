@@ -27,9 +27,9 @@ func NewMongoClient() (*MongoClient, error) {
 	}
 
 	collections := map[string]*mongo.Collection{
-		"uplay": client.Database("gor6").Collection("uplay"),
-		"psn":   client.Database("gor6").Collection("psn"),
-		"xbl":   client.Database("gor6").Collection("xbl"),
+		"uplay": client.Database("gor6").Collection("pc"),
+		"psn":   client.Database("gor6").Collection("ps4"),
+		"xbl":   client.Database("gor6").Collection("xbox"),
 	}
 
 	return &MongoClient{
