@@ -91,8 +91,7 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 }
 
 func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	fmt.Println(id, p)
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20210813&endDate=20211211", id, models.PlatformURLNames2[p])
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20210813&endDate=%s", id, models.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player summary specific 1")
@@ -163,23 +162,52 @@ func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.Wai
 }
 
 func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	fmt.Println(id, p)
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20210811&endDate=%s", id, models.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20160101&endDate=%s", id, models.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player summary specific 1", err)
+		log.Println("error fetching player operator 1", err)
 		wg.Done()
 		return
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player summary specific 2", err)
+		log.Println("error fetching player operator 2", err)
 		wg.Done()
 		return
 	}
 
-	fmt.Print("Operators:", res)
+	defer res.Body.Close()
+	fmt.Println("Summary:", res)
+	if res.StatusCode != 200 {
+		fmt.Println("error fetching player operator 3", res.Status)
+		wg.Done()
+		return
+	}
+
+	var m models.OperatorModel
+	de := json.NewDecoder(res.Body).Decode(&m)
+	if de != nil {
+		log.Println("error fetching player operator 4", de)
+		wg.Done()
+		return
+	}
+
+	var wl models.OperatorPlatform
+	switch p {
+	case "uplay":
+		wl = m.Platforms.Pc
+	case "psn":
+		wl = m.Platforms.Ps4
+	case "xbl":
+		wl = m.Platforms.Xbox
+	default:
+		log.Println("error fetching player operator 5")
+		wg.Done()
+		return
+	}
+
+	player.Operators = wl.GameModes
 	wg.Done()
 }
 
@@ -262,11 +290,11 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.Wai
 	var sl models.SummaryPlatform
 	switch p {
 	case "uplay":
-		sl = sm.Platforms.SPc
+		sl = sm.Platforms.Pc
 	case "psn":
-		sl = sm.Platforms.SPs
+		sl = sm.Platforms.Ps4
 	case "xbl":
-		sl = sm.Platforms.SXbox
+		sl = sm.Platforms.Xbox
 	default:
 		log.Println("error fetching player level 5")
 		wg.Done()

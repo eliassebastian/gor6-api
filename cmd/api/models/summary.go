@@ -54,7 +54,7 @@ type SummaryPlatform struct {
 }
 
 type SummaryPlatforms struct {
-	SPc   SummaryPlatform `json:"PC,omitempty"`
-	SXbox SummaryPlatform `json:"XBOX,omitempty"`
-	SPs   SummaryPlatform `json:"PS4,omitempty"`
+	Pc   SummaryPlatform `json:"PC,omitempty"`
+	Xbox SummaryPlatform `json:"XBOX,omitempty"`
+	Ps4  SummaryPlatform `json:"PS4,omitempty"`
 }

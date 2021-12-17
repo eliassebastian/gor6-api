@@ -1,8 +1,12 @@
 package models
 
-type OperatorModel struct {
-	ProfileID string            `json:"profileId"`
-	Platforms OperatorPlatforms `json:"platforms"`
+type MapsModel struct {
+	ProfileID string `json:"profileId"`
+	//StartDate int       `json:"startDate"`
+	//EndDate   int       `json:"endDate"`
+	//Region    string    `json:"region"`
+	//StatType  string    `json:"statType"`
+	Platforms MapsPlatforms `json:"platforms"`
 }
 
 /*
@@ -10,60 +14,50 @@ type KillDeathRatio struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type HeadshotAccuracy struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type KillsPerRound struct {
-	Value int `json:"value"`
-	P     int `json:"p"`
+	Value float64 `json:"value"`
+	P     int     `json:"p"`
 }
-
 type RoundsWithAKill struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type RoundsWithMultiKill struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type RoundsWithOpeningKill struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type RoundsWithOpeningDeath struct {
-	Value float64 `json:"value"`
-	P     int     `json:"p"`
+	Value int `json:"value"`
+	P     int `json:"p"`
 }
-
 type RoundsWithKOST struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type RoundsSurvived struct {
 	Value float64 `json:"value"`
 	P     int     `json:"p"`
 }
-
 type RoundsWithAnAce struct {
 	Value int `json:"value"`
 	P     int `json:"p"`
 }
-
 type RoundsWithClutch struct {
 	Value int `json:"value"`
 	P     int `json:"p"`
 }
 */
-type OperatorSide struct {
-	//Type      string `json:"type"`
-	//StatsType string `json:"statsType"`
+type Map struct {
+	//Type          string `json:"type"`
+	//StatsType     string `json:"statsType"`
 	StatsDetail   string `json:"statsDetail"`
 	MatchesPlayed int    `json:"matchesPlayed"`
 	RoundsPlayed  int    `json:"roundsPlayed"`
@@ -85,7 +79,7 @@ type OperatorSide struct {
 	//OpeningDeathTrades     int                    `json:"openingDeathTrades"`
 	//Revives                int                    `json:"revives"`
 	//DistanceTravelled      int                    `json:"distanceTravelled"`
-	//WinLossRatio int `json:"winLossRatio"`
+	//WinLossRatio           int                    `json:"winLossRatio"`
 	//KillDeathRatio         KillDeathRatio         `json:"killDeathRatio"`
 	//HeadshotAccuracy       HeadshotAccuracy       `json:"headshotAccuracy"`
 	//KillsPerRound          KillsPerRound          `json:"killsPerRound"`
@@ -101,30 +95,26 @@ type OperatorSide struct {
 	TimeDeadPerMatch  float64 `json:"timeDeadPerMatch"`
 	DistancePerRound  float64 `json:"distancePerRound"`
 }
-
-type OperatorTeamRoles struct {
-	Attacker []OperatorSide `json:"attacker"`
-	Defender []OperatorSide `json:"defender"`
+type MapsTeamRoles struct {
+	All      []Map `json:"all"`
+	Attacker []Map `json:"attacker"`
+	Defender []Map `json:"defender"`
 }
-
-type OperatorGameMode struct {
-	//Type      string    `json:"type"`
-	TeamRoles OperatorTeamRoles `json:"teamRoles"`
+type MapsGameMode struct {
+	Type      string        `json:"type"`
+	TeamRoles MapsTeamRoles `json:"teamRoles"`
 }
-
-type OperatorGameModes struct {
-	All      OperatorGameMode `json:"all"`
-	Casual   OperatorGameMode `json:"casual"`
-	Ranked   OperatorGameMode `json:"ranked"`
-	Unranked OperatorGameMode `json:"unranked"`
+type MapsGameModes struct {
+	All      MapsGameMode `json:"all"`
+	Casual   MapsGameMode `json:"casual"`
+	Ranked   MapsGameMode `json:"ranked"`
+	Unranked MapsGameMode `json:"unranked"`
 }
-
-type OperatorPlatform struct {
-	GameModes OperatorGameModes `json:"gameModes"`
+type MapsPlatform struct {
+	GameModes MapsGameModes `json:"gameModes"`
 }
-
-type OperatorPlatforms struct {
-	Pc   OperatorPlatform `json:"PC,omitempty"`
-	Xbox OperatorPlatform `json:"XBOX,omitempty"`
-	Ps4  OperatorPlatform `json:"PS4,omitempty"`
+type MapsPlatforms struct {
+	Pc   MapsPlatform `json:"PC,omitempty"`
+	Xbox MapsPlatform `json:"XBOX,omitempty"`
+	Ps4  MapsPlatform `json:"PS4,omitempty"`
 }
