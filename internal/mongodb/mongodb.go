@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -41,4 +42,14 @@ func NewMongoClient() (*MongoClient, error) {
 
 func (c *MongoClient) Close() {
 	c.Client.Disconnect(c.Ctx)
+}
+
+func (c *MongoClient) NewPlayer(ctx context.Context, p string, document interface{}) interface{} {
+	insert, err := c.Collections[p].InsertOne(ctx, document)
+	if err != nil {
+		fmt.Println("error inserting document into mongo:", err)
+		return nil
+	}
+
+	return insert.InsertedID
 }

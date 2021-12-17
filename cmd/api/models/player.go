@@ -3,7 +3,7 @@ package models
 import "time"
 
 type PlayerFullProfile struct {
-	ProfileID  string            `json:"profileID"`
+	ProfileID  string            `json:"profileID" bson:"_id"`
 	PlatformID string            `json:"platformID"`
 	Platform   string            `json:"platform"`
 	NickName   string            `json:"nickName"`

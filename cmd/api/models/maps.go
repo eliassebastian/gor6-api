@@ -115,6 +115,6 @@ type MapsPlatform struct {
 }
 type MapsPlatforms struct {
 	Pc   MapsPlatform `json:"PC,omitempty"`
-	Xbox MapsPlatform `json:"XBOX,omitempty"`
+	Xbox MapsPlatform `json:"XONE,omitempty"`
 	Ps4  MapsPlatform `json:"PS4,omitempty"`
 }

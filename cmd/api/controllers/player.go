@@ -427,10 +427,9 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 		return nil, err
 	}
 
-	if res != nil {
+	if res == nil {
 		return nil, errors.New("player not found")
 	}
-
 	//TODO create channel for communication between goroutines
 	wg := &sync.WaitGroup{}
 	player := &models.PlayerFullProfile{
@@ -456,7 +455,12 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 	case <-ctx.Done():
 		return nil, errors.New("fetch new player context cancelled")
 	default:
-		log.Println("Fetch New Player Default select")
+		res := pc.mc.NewPlayer(ctx, p, player)
+		if res == nil {
+			log.Println("error inserting player into mongodb")
+			return nil, errors.New("error inserting player into mongodb")
+		}
+		log.Println("Fetch New Player Default select & inserted into mongodb")
 		return player, nil
 	}
 }

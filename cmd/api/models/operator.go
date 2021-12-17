@@ -125,6 +125,6 @@ type OperatorPlatform struct {
 
 type OperatorPlatforms struct {
 	Pc   OperatorPlatform `json:"PC,omitempty"`
-	Xbox OperatorPlatform `json:"XBOX,omitempty"`
+	Xbox OperatorPlatform `json:"XONE,omitempty"`
 	Ps4  OperatorPlatform `json:"PS4,omitempty"`
 }

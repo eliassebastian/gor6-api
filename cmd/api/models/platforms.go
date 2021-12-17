@@ -15,5 +15,5 @@ var PlatformURLNames = map[string]string{
 var PlatformURLNames2 = map[string]string{
 	"uplay": "PC",
 	"psn":   "PS4",
-	"xbl":   "XBOX",
+	"xbl":   "XONE",
 }

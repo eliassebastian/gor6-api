@@ -61,6 +61,6 @@ type WeaponsPlatform struct {
 
 type WeaponsPlatforms struct {
 	Pc   WeaponsPlatform `json:"PC,omitempty"`
-	Xbox WeaponsPlatform `json:"XBOX,omitempty"`
+	Xbox WeaponsPlatform `json:"XONE,omitempty"`
 	Ps4  WeaponsPlatform `json:"PS4,omitempty"`
 }
