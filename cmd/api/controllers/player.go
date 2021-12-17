@@ -412,6 +412,9 @@ func (pc *PlayerController) fetchPlayerProfile(ctx context.Context, n, p string)
 	if de != nil {
 		return nil, errors.New("error decoding player")
 	}
+	if len(player.Profiles) == 0 {
+		return nil, nil
+	}
 	return &player.Profiles[0], nil
 }
 
@@ -422,6 +425,10 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 	res, err := pc.fetchPlayerProfile(ctx, n, p)
 	if err != nil {
 		return nil, err
+	}
+
+	if res != nil {
+		return nil, errors.New("player not found")
 	}
 
 	//TODO create channel for communication between goroutines
