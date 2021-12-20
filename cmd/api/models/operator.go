@@ -97,9 +97,9 @@ type OperatorSide struct {
 	//RoundsSurvived         RoundsSurvived         `json:"roundsSurvived"`
 	//RoundsWithAnAce        RoundsWithAnAce        `json:"roundsWithAnAce"`
 	//RoundsWithClutch       RoundsWithClutch       `json:"roundsWithClutch"`
-	TimeAlivePerMatch float64 `json:"timeAlivePerMatch"`
-	TimeDeadPerMatch  float64 `json:"timeDeadPerMatch"`
-	DistancePerRound  float64 `json:"distancePerRound"`
+	TimeAlivePerMatch float32 `json:"timeAlivePerMatch" bson:"timeAlivePerMatch_F32"`
+	TimeDeadPerMatch  float32 `json:"timeDeadPerMatch" bson:"timeDeadPerMatch_F32"`
+	DistancePerRound  float32 `json:"distancePerRound" bson:"distancePerRound_F32"`
 }
 
 type OperatorTeamRoles struct {

@@ -455,10 +455,9 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 	case <-ctx.Done():
 		return nil, errors.New("fetch new player context cancelled")
 	default:
-		res := pc.mc.NewPlayer(ctx, p, player)
-		if res == nil {
-			log.Println("error inserting player into mongodb")
-			return nil, errors.New("error inserting player into mongodb")
+		err := pc.mc.NewPlayer(ctx, p, player)
+		if err != nil {
+			return nil, err
 		}
 		log.Println("Fetch New Player Default select & inserted into mongodb")
 		return player, nil

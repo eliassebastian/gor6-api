@@ -14,7 +14,7 @@ type Weapons struct {
 	Headshots    int    `json:"headshots"`
 	//HeadshotAccuracy    float32 `json:"headshotAccuracy"`
 	//RoundsWithAKill     float32 `json:"roundsWithAKill"`
-	RoundsWithMultiKill float32 `json:"roundsWithMultiKill"`
+	RoundsWithMultiKill float32 `json:"roundsWithMultiKill" bson:"roundsWithMultiKill_F32"`
 }
 
 type WeaponTypes struct {

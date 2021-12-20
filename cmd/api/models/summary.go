@@ -29,9 +29,9 @@ type SummarySeason struct {
 	OpeningKills      int     `json:"openingKills"`
 	OpeningDeaths     int     `json:"openingDeaths"`
 	Trades            int     `json:"trades"`
-	TimeAlivePerMatch float64 `json:"timeAlivePerMatch"`
-	TimeDeadPerMatch  float64 `json:"timeDeadPerMatch"`
-	DistancePerRound  float64 `json:"distancePerRound"`
+	TimeAlivePerMatch float32 `json:"timeAlivePerMatch" bson:"timeAlivePerMatch_F32"`
+	TimeDeadPerMatch  float32 `json:"timeDeadPerMatch" bson:"timeDeadPerMatch_F32"`
+	DistancePerRound  float32 `json:"distancePerRound" bson:"distancePerRound_F32"`
 }
 
 type SummaryTeamRoles struct {
