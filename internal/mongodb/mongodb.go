@@ -23,7 +23,7 @@ func NewMongoClient() (*MongoClient, error) {
 
 	ep := client.Ping(ctx, nil)
 	if ep != nil {
-		return nil, errors.New("error connecting to mongodb")
+		return nil, errors.New(ep.Error())
 	}
 
 	collections := map[string]*mongo.Collection{
