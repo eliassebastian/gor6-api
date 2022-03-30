@@ -2,11 +2,10 @@ package controllers
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/eliassebastian/gor6-api/cmd/api/models"
+	"github.com/eliassebastian/gor6-api/cmd/api/graph/models"
 	"github.com/eliassebastian/gor6-api/cmd/api/util"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
 	"github.com/eliassebastian/gor6-api/internal/mongodb"
@@ -19,29 +18,14 @@ import (
 )
 
 type PlayerController struct {
-	ec *elastic.ESClient
-	mc *mongodb.MongoClient
-	sm *sync.Map
-	hc *http.Client
-}
-
-func NewPlayerController(c *elastic.ESClient, m *mongodb.MongoClient, tlsc *tls.Config, p *sync.Map) *PlayerController {
-	return &PlayerController{
-		ec: c,
-		mc: m,
-		sm: p,
-		hc: &http.Client{
-			Timeout: 10 * time.Second,
-			//Transport: &http.Transport{
-			//	ForceAttemptHTTP2: true,
-			//	TLSClientConfig:   tlsc,
-			//},
-		},
-	}
+	EC *elastic.ESClient
+	MC *mongodb.MongoClient
+	SM *sync.Map
+	HC *http.Client
 }
 
 func (pc *PlayerController) getHeader() http.Header {
-	sd, ok := pc.sm.Load("session")
+	sd, ok := pc.SM.Load("session")
 	if !ok {
 		return nil
 	}
@@ -61,11 +45,11 @@ func (pc *PlayerController) getHeader() http.Header {
 }
 
 func getSpaceId(p string) string {
-	return models.SpaceIds[p]
+	return model.SpaceIds[p]
 }
 
 func getPlatformURL(p string) string {
-	return models.PlatformURLNames[p]
+	return model.PlatformURLNames[p]
 }
 
 func genExpiration() string {
@@ -90,8 +74,8 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 	return false, nil, nil
 }
 
-func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, models.PlatformURLNames2[p], getDate())
+func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player map 1")
@@ -99,7 +83,7 @@ func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGr
 		return
 	}
 	req.Header = pc.getHeader()
-	res, err := pc.hc.Do(req)
+	res, err := pc.HC.Do(req)
 	if err != nil {
 		log.Println("error fetching player map 2", err)
 		wg.Done()
@@ -140,7 +124,7 @@ func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGr
 }
 
 func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all&platform=%s&teamRole=all&startDate=20160101&endDate=%s", id, models.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all&platform=%s&teamRole=all&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player weapon specific 1")
@@ -191,7 +175,7 @@ func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.Wai
 }
 
 func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.WaitGroup, player *models.PlayerFullProfile, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20160101&endDate=%s", id, models.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player operator 1", err)
@@ -432,11 +416,12 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (in
 	}
 	//TODO create channel for communication between goroutines
 	wg := &sync.WaitGroup{}
-	player := &models.PlayerFullProfile{
-		ProfileID:  res.ProfileID,
+	player := &model.Player{
+		ID:         res.ProfileID,
 		PlatformID: res.IDOnPlatform,
 		Platform:   res.PlatformType,
 		NickName:   res.NameOnPlatform,
+		//Aliases:
 		LastUpdate: time.Now().UTC(),
 	}
 	//if found, put in cache

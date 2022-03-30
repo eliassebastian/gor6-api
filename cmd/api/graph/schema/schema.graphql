@@ -1,0 +1,93 @@
+
+
+type Weapons {
+    weaponname: String
+    roundsplayed: Int
+    roundswon: Int
+    roundslost: Int
+    kills: Int
+    headshots: Int
+    roundswithmultikill: Float
+}
+
+type WeaponTypes {
+    #    weapontype: String
+    weapons: [Weapons]
+}
+
+type PrimaryWeapons {
+    weapontypes: WeaponTypes
+}
+
+type SecondaryWeapons {
+    weapontypes: WeaponTypes
+}
+
+type WeaponSlots {
+    primaryweapons: PrimaryWeapons
+    secondaryweapons: SecondaryWeapons
+}
+
+type WeaponsAll {
+    weaponslots: WeaponSlots
+}
+
+type WeaponsTeamRoles {
+    all: WeaponsAll
+}
+
+type WeaponsGameMode {
+    teamroles: WeaponsTeamRoles
+}
+
+type WeaponsGameModes {
+    all:      WeaponsGameMode
+    casual:   WeaponsGameMode
+    ranked:   WeaponsGameMode
+    unranked: WeaponsGameMode
+}
+
+type Level {
+    value: String
+    lastmodified: Time
+}
+
+type TimePlayed {
+    value: String
+    lastmodified: Time
+}
+
+type Alias {
+    name: String
+    date: Time
+}
+
+# Player Type (MAIN)
+type Player {
+    _id: String!
+    nickname: String!
+    platform: String!
+    platformid: String!
+    aliases: [Alias]!
+    weapons: WeaponsGameModes!
+    timeplayed: TimePlayed!
+    #    summary: Summary!
+    #    ranked: [Ranked!]
+    #    operators: Operators!
+    #    maps: Maps!
+    level: Level!
+    lastupdate: Time!
+}
+
+input PlayerSearch {
+    name: String!
+    platform: String!
+}
+
+type Query {
+    playerquery(input: PlayerSearch!): Player
+    searchquery(input: PlayerSearch!): [Player!]
+    testquery(input: PlayerSearch!): Player
+}
+
+scalar Time

@@ -1,4 +1,4 @@
-package models
+package model
 
 var SpaceIds = map[string]string{
 	"uplay": "5172a557-50b5-4665-b7db-e3f2e8c5041d",
