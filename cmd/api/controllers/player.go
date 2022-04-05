@@ -158,7 +158,6 @@ func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.Wai
 	}
 
 	defer res.Body.Close()
-	fmt.Println("Summary:", res)
 	if res.StatusCode != 200 {
 		fmt.Println("error fetching player weapon 3", res.Status)
 		wg.Done()
@@ -209,7 +208,6 @@ func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.W
 	}
 
 	defer res.Body.Close()
-	fmt.Println("Summary:", res)
 	if res.StatusCode != 200 {
 		fmt.Println("error fetching player operator 3", res.Status)
 		wg.Done()
@@ -334,7 +332,7 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.Wai
 		wg.Done()
 		return
 	}
-	//log.Println(tm)
+
 	var sl model.SummaryPlatform
 	switch p {
 	case "uplay":
@@ -371,7 +369,6 @@ func (pc *PlayerController) fetchPlayerPlayTimeLevel(ctx context.Context, wg *sy
 	}
 
 	defer res.Body.Close()
-
 	if res.StatusCode != 200 {
 		log.Println("error fetching player level 4")
 		wg.Done()
