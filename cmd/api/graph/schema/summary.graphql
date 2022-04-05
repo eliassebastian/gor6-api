@@ -1,0 +1,37 @@
+type SummarySeason {
+    seasonyear:        String
+    seasonnumber:      String
+    matchesplayed:     Int
+    roundsplayed:      Int
+    minutesplayed:     Int
+    matcheswon:        Int
+    matcheslost:       Int
+    roundswon:         Int
+    roundslost:        Int
+    kills:             Int
+    assists:           Int
+    death:             Int
+    headshots:         Int
+    meleekills:        Int
+    openingkills:      Int
+    openingdeaths:     Int
+    trades:            Int
+    timealivepermatch: Float
+    timedeadpermatch:  Float
+    distanceperround:  Float
+}
+
+type SummaryTeamRoles {
+    all: [SummarySeason]
+}
+
+type SummaryGameMode {
+    teamroles: SummaryTeamRoles
+}
+
+type SummaryGameModes {
+    casual:   SummaryGameMode
+    ranked:   SummaryGameMode
+    unranked: SummaryGameMode
+    all:      SummaryGameMode
+}

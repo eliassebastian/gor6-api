@@ -11,7 +11,13 @@ type ESClient struct {
 
 func NewElasticClient() (*ESClient, error) {
 	//TODO: Secure ElasticSearch Client
-	es, err := elasticsearch.NewDefaultClient()
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			"http://localhost:9200",
+		},
+	}
+
+	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		return nil, errors.New("error creating new elasticsearch client")
 	}

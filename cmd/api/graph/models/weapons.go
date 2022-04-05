@@ -16,7 +16,6 @@ type Weapons struct {
 }
 
 type WeaponTypes struct {
-	//WeaponType string    `json:"weaponType"`
 	Weapons []*Weapons `json:"weapons"`
 }
 

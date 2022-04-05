@@ -13,8 +13,8 @@ type TimePlayed struct {
 }
 
 type Stats struct {
-	TimePlayed *TimePlayed `json:"PPvPTimePlayed"`
-	Level      *Level      `json:"PClearanceLevel"`
+	TimePlayed TimePlayed `json:"PPvPTimePlayed"`
+	Level      Level      `json:"PClearanceLevel"`
 }
 
 type TimeAndLevelProfiles struct {

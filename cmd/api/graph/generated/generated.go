@@ -35,9 +35,13 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Map() MapResolver
+	OperatorSide() OperatorSideResolver
 	PrimaryWeapons() PrimaryWeaponsResolver
 	Query() QueryResolver
+	RankedSeason() RankedSeasonResolver
 	SecondaryWeapons() SecondaryWeaponsResolver
+	SummarySeason() SummarySeasonResolver
 	Weapons() WeaponsResolver
 }
 
@@ -55,7 +59,95 @@ type ComplexityRoot struct {
 		Value        func(childComplexity int) int
 	}
 
+	Map struct {
+		Assists           func(childComplexity int) int
+		Death             func(childComplexity int) int
+		Distanceperround  func(childComplexity int) int
+		Headshots         func(childComplexity int) int
+		Kills             func(childComplexity int) int
+		MatchesLost       func(childComplexity int) int
+		MatchesPlayed     func(childComplexity int) int
+		MatchesWon        func(childComplexity int) int
+		MeleeKills        func(childComplexity int) int
+		MinutesPlayed     func(childComplexity int) int
+		RoundsLost        func(childComplexity int) int
+		RoundsPlayed      func(childComplexity int) int
+		RoundsWon         func(childComplexity int) int
+		StatsDetail       func(childComplexity int) int
+		Timealivepermatch func(childComplexity int) int
+		Timedeadpermatch  func(childComplexity int) int
+	}
+
+	MapsGameMode struct {
+		TeamRoles func(childComplexity int) int
+		Type      func(childComplexity int) int
+	}
+
+	MapsGameModes struct {
+		All      func(childComplexity int) int
+		Casual   func(childComplexity int) int
+		Ranked   func(childComplexity int) int
+		Unranked func(childComplexity int) int
+	}
+
+	MapsTeamRoles struct {
+		All      func(childComplexity int) int
+		Attacker func(childComplexity int) int
+		Defender func(childComplexity int) int
+	}
+
+	OperatorGameMode struct {
+		TeamRoles func(childComplexity int) int
+	}
+
+	OperatorGameModes struct {
+		All      func(childComplexity int) int
+		Casual   func(childComplexity int) int
+		Ranked   func(childComplexity int) int
+		Unranked func(childComplexity int) int
+	}
+
+	OperatorSide struct {
+		Assists           func(childComplexity int) int
+		Death             func(childComplexity int) int
+		Distanceperround  func(childComplexity int) int
+		Headshots         func(childComplexity int) int
+		Kills             func(childComplexity int) int
+		MatchesLost       func(childComplexity int) int
+		MatchesPlayed     func(childComplexity int) int
+		MatchesWon        func(childComplexity int) int
+		MeleeKills        func(childComplexity int) int
+		MinutesPlayed     func(childComplexity int) int
+		RoundsLost        func(childComplexity int) int
+		RoundsPlayed      func(childComplexity int) int
+		RoundsWon         func(childComplexity int) int
+		StatsDetail       func(childComplexity int) int
+		Timealivepermatch func(childComplexity int) int
+		Timedeadpermatch  func(childComplexity int) int
+	}
+
+	OperatorTeamRoles struct {
+		Attacker func(childComplexity int) int
+		Defender func(childComplexity int) int
+	}
+
 	Player struct {
+		Aliases    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		LastUpdate func(childComplexity int) int
+		Level      func(childComplexity int) int
+		Maps       func(childComplexity int) int
+		NickName   func(childComplexity int) int
+		Operators  func(childComplexity int) int
+		Platform   func(childComplexity int) int
+		PlatformID func(childComplexity int) int
+		Ranked     func(childComplexity int) int
+		Summary    func(childComplexity int) int
+		TimePlayed func(childComplexity int) int
+		Weapons    func(childComplexity int) int
+	}
+
+	PlayerSearchResults struct {
 		Aliases    func(childComplexity int) int
 		ID         func(childComplexity int) int
 		LastUpdate func(childComplexity int) int
@@ -63,8 +155,8 @@ type ComplexityRoot struct {
 		NickName   func(childComplexity int) int
 		Platform   func(childComplexity int) int
 		PlatformID func(childComplexity int) int
+		Ranked     func(childComplexity int) int
 		TimePlayed func(childComplexity int) int
-		Weapons    func(childComplexity int) int
 	}
 
 	PrimaryWeapons struct {
@@ -77,8 +169,63 @@ type ComplexityRoot struct {
 		Testquery   func(childComplexity int, input model.PlayerSearch) int
 	}
 
+	RankedSeason struct {
+		Abandons           func(childComplexity int) int
+		Deaths             func(childComplexity int) int
+		Kills              func(childComplexity int) int
+		LastMatchResult    func(childComplexity int) int
+		Lastmatchmmrchange func(childComplexity int) int
+		Losses             func(childComplexity int) int
+		MaxRank            func(childComplexity int) int
+		Maxmmr             func(childComplexity int) int
+		Mmr                func(childComplexity int) int
+		Rank               func(childComplexity int) int
+		Season             func(childComplexity int) int
+		Skillmean          func(childComplexity int) int
+		Skillstdev         func(childComplexity int) int
+		Wins               func(childComplexity int) int
+	}
+
 	SecondaryWeapons struct {
 		Weapontypes func(childComplexity int) int
+	}
+
+	SummaryGameMode struct {
+		TeamRoles func(childComplexity int) int
+	}
+
+	SummaryGameModes struct {
+		All      func(childComplexity int) int
+		Casual   func(childComplexity int) int
+		Ranked   func(childComplexity int) int
+		Unranked func(childComplexity int) int
+	}
+
+	SummarySeason struct {
+		Assists           func(childComplexity int) int
+		Death             func(childComplexity int) int
+		Distanceperround  func(childComplexity int) int
+		Headshots         func(childComplexity int) int
+		Kills             func(childComplexity int) int
+		MatchesLost       func(childComplexity int) int
+		MatchesPlayed     func(childComplexity int) int
+		MatchesWon        func(childComplexity int) int
+		MeleeKills        func(childComplexity int) int
+		MinutesPlayed     func(childComplexity int) int
+		OpeningDeaths     func(childComplexity int) int
+		OpeningKills      func(childComplexity int) int
+		RoundsLost        func(childComplexity int) int
+		RoundsPlayed      func(childComplexity int) int
+		RoundsWon         func(childComplexity int) int
+		SeasonNumber      func(childComplexity int) int
+		SeasonYear        func(childComplexity int) int
+		Timealivepermatch func(childComplexity int) int
+		Timedeadpermatch  func(childComplexity int) int
+		Trades            func(childComplexity int) int
+	}
+
+	SummaryTeamRoles struct {
+		All func(childComplexity int) int
 	}
 
 	TimePlayed struct {
@@ -125,16 +272,41 @@ type ComplexityRoot struct {
 	}
 }
 
+type MapResolver interface {
+	Timealivepermatch(ctx context.Context, obj *model.Map) (*float64, error)
+	Timedeadpermatch(ctx context.Context, obj *model.Map) (*float64, error)
+	Distanceperround(ctx context.Context, obj *model.Map) (*float64, error)
+}
+type OperatorSideResolver interface {
+	Timealivepermatch(ctx context.Context, obj *model.OperatorSide) (*float64, error)
+	Timedeadpermatch(ctx context.Context, obj *model.OperatorSide) (*float64, error)
+	Distanceperround(ctx context.Context, obj *model.OperatorSide) (*float64, error)
+}
 type PrimaryWeaponsResolver interface {
 	Weapontypes(ctx context.Context, obj *model.PrimaryWeapons) (*model.WeaponTypes, error)
 }
 type QueryResolver interface {
 	Playerquery(ctx context.Context, input model.PlayerSearch) (*model.Player, error)
-	Searchquery(ctx context.Context, input model.PlayerSearch) ([]*model.Player, error)
+	Searchquery(ctx context.Context, input model.PlayerSearch) ([]*model.PlayerSearchResults, error)
 	Testquery(ctx context.Context, input model.PlayerSearch) (*model.Player, error)
+}
+type RankedSeasonResolver interface {
+	Maxmmr(ctx context.Context, obj *model.RankedSeason) (*float64, error)
+	Skillmean(ctx context.Context, obj *model.RankedSeason) (*float64, error)
+
+	Skillstdev(ctx context.Context, obj *model.RankedSeason) (*float64, error)
+
+	Lastmatchmmrchange(ctx context.Context, obj *model.RankedSeason) (*float64, error)
+
+	Mmr(ctx context.Context, obj *model.RankedSeason) (*float64, error)
 }
 type SecondaryWeaponsResolver interface {
 	Weapontypes(ctx context.Context, obj *model.SecondaryWeapons) (*model.WeaponTypes, error)
+}
+type SummarySeasonResolver interface {
+	Timealivepermatch(ctx context.Context, obj *model.SummarySeason) (*float64, error)
+	Timedeadpermatch(ctx context.Context, obj *model.SummarySeason) (*float64, error)
+	Distanceperround(ctx context.Context, obj *model.SummarySeason) (*float64, error)
 }
 type WeaponsResolver interface {
 	Roundswithmultikill(ctx context.Context, obj *model.Weapons) (*float64, error)
@@ -183,6 +355,342 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Level.Value(childComplexity), true
 
+	case "Map.assists":
+		if e.complexity.Map.Assists == nil {
+			break
+		}
+
+		return e.complexity.Map.Assists(childComplexity), true
+
+	case "Map.death":
+		if e.complexity.Map.Death == nil {
+			break
+		}
+
+		return e.complexity.Map.Death(childComplexity), true
+
+	case "Map.distanceperround":
+		if e.complexity.Map.Distanceperround == nil {
+			break
+		}
+
+		return e.complexity.Map.Distanceperround(childComplexity), true
+
+	case "Map.headshots":
+		if e.complexity.Map.Headshots == nil {
+			break
+		}
+
+		return e.complexity.Map.Headshots(childComplexity), true
+
+	case "Map.kills":
+		if e.complexity.Map.Kills == nil {
+			break
+		}
+
+		return e.complexity.Map.Kills(childComplexity), true
+
+	case "Map.matcheslost":
+		if e.complexity.Map.MatchesLost == nil {
+			break
+		}
+
+		return e.complexity.Map.MatchesLost(childComplexity), true
+
+	case "Map.matchesplayed":
+		if e.complexity.Map.MatchesPlayed == nil {
+			break
+		}
+
+		return e.complexity.Map.MatchesPlayed(childComplexity), true
+
+	case "Map.matcheswon":
+		if e.complexity.Map.MatchesWon == nil {
+			break
+		}
+
+		return e.complexity.Map.MatchesWon(childComplexity), true
+
+	case "Map.meleekills":
+		if e.complexity.Map.MeleeKills == nil {
+			break
+		}
+
+		return e.complexity.Map.MeleeKills(childComplexity), true
+
+	case "Map.minutesplayed":
+		if e.complexity.Map.MinutesPlayed == nil {
+			break
+		}
+
+		return e.complexity.Map.MinutesPlayed(childComplexity), true
+
+	case "Map.roundslost":
+		if e.complexity.Map.RoundsLost == nil {
+			break
+		}
+
+		return e.complexity.Map.RoundsLost(childComplexity), true
+
+	case "Map.roundsplayed":
+		if e.complexity.Map.RoundsPlayed == nil {
+			break
+		}
+
+		return e.complexity.Map.RoundsPlayed(childComplexity), true
+
+	case "Map.roundswon":
+		if e.complexity.Map.RoundsWon == nil {
+			break
+		}
+
+		return e.complexity.Map.RoundsWon(childComplexity), true
+
+	case "Map.statsdetail":
+		if e.complexity.Map.StatsDetail == nil {
+			break
+		}
+
+		return e.complexity.Map.StatsDetail(childComplexity), true
+
+	case "Map.timealivepermatch":
+		if e.complexity.Map.Timealivepermatch == nil {
+			break
+		}
+
+		return e.complexity.Map.Timealivepermatch(childComplexity), true
+
+	case "Map.timedeadpermatch":
+		if e.complexity.Map.Timedeadpermatch == nil {
+			break
+		}
+
+		return e.complexity.Map.Timedeadpermatch(childComplexity), true
+
+	case "MapsGameMode.teamroles":
+		if e.complexity.MapsGameMode.TeamRoles == nil {
+			break
+		}
+
+		return e.complexity.MapsGameMode.TeamRoles(childComplexity), true
+
+	case "MapsGameMode.type":
+		if e.complexity.MapsGameMode.Type == nil {
+			break
+		}
+
+		return e.complexity.MapsGameMode.Type(childComplexity), true
+
+	case "MapsGameModes.all":
+		if e.complexity.MapsGameModes.All == nil {
+			break
+		}
+
+		return e.complexity.MapsGameModes.All(childComplexity), true
+
+	case "MapsGameModes.casual":
+		if e.complexity.MapsGameModes.Casual == nil {
+			break
+		}
+
+		return e.complexity.MapsGameModes.Casual(childComplexity), true
+
+	case "MapsGameModes.ranked":
+		if e.complexity.MapsGameModes.Ranked == nil {
+			break
+		}
+
+		return e.complexity.MapsGameModes.Ranked(childComplexity), true
+
+	case "MapsGameModes.unranked":
+		if e.complexity.MapsGameModes.Unranked == nil {
+			break
+		}
+
+		return e.complexity.MapsGameModes.Unranked(childComplexity), true
+
+	case "MapsTeamRoles.all":
+		if e.complexity.MapsTeamRoles.All == nil {
+			break
+		}
+
+		return e.complexity.MapsTeamRoles.All(childComplexity), true
+
+	case "MapsTeamRoles.attacker":
+		if e.complexity.MapsTeamRoles.Attacker == nil {
+			break
+		}
+
+		return e.complexity.MapsTeamRoles.Attacker(childComplexity), true
+
+	case "MapsTeamRoles.defender":
+		if e.complexity.MapsTeamRoles.Defender == nil {
+			break
+		}
+
+		return e.complexity.MapsTeamRoles.Defender(childComplexity), true
+
+	case "OperatorGameMode.teamroles":
+		if e.complexity.OperatorGameMode.TeamRoles == nil {
+			break
+		}
+
+		return e.complexity.OperatorGameMode.TeamRoles(childComplexity), true
+
+	case "OperatorGameModes.all":
+		if e.complexity.OperatorGameModes.All == nil {
+			break
+		}
+
+		return e.complexity.OperatorGameModes.All(childComplexity), true
+
+	case "OperatorGameModes.casual":
+		if e.complexity.OperatorGameModes.Casual == nil {
+			break
+		}
+
+		return e.complexity.OperatorGameModes.Casual(childComplexity), true
+
+	case "OperatorGameModes.ranked":
+		if e.complexity.OperatorGameModes.Ranked == nil {
+			break
+		}
+
+		return e.complexity.OperatorGameModes.Ranked(childComplexity), true
+
+	case "OperatorGameModes.unranked":
+		if e.complexity.OperatorGameModes.Unranked == nil {
+			break
+		}
+
+		return e.complexity.OperatorGameModes.Unranked(childComplexity), true
+
+	case "OperatorSide.assists":
+		if e.complexity.OperatorSide.Assists == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Assists(childComplexity), true
+
+	case "OperatorSide.death":
+		if e.complexity.OperatorSide.Death == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Death(childComplexity), true
+
+	case "OperatorSide.distanceperround":
+		if e.complexity.OperatorSide.Distanceperround == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Distanceperround(childComplexity), true
+
+	case "OperatorSide.headshots":
+		if e.complexity.OperatorSide.Headshots == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Headshots(childComplexity), true
+
+	case "OperatorSide.kills":
+		if e.complexity.OperatorSide.Kills == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Kills(childComplexity), true
+
+	case "OperatorSide.matcheslost":
+		if e.complexity.OperatorSide.MatchesLost == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.MatchesLost(childComplexity), true
+
+	case "OperatorSide.matchesplayed":
+		if e.complexity.OperatorSide.MatchesPlayed == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.MatchesPlayed(childComplexity), true
+
+	case "OperatorSide.matcheswon":
+		if e.complexity.OperatorSide.MatchesWon == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.MatchesWon(childComplexity), true
+
+	case "OperatorSide.meleekills":
+		if e.complexity.OperatorSide.MeleeKills == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.MeleeKills(childComplexity), true
+
+	case "OperatorSide.minutesplayed":
+		if e.complexity.OperatorSide.MinutesPlayed == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.MinutesPlayed(childComplexity), true
+
+	case "OperatorSide.roundslost":
+		if e.complexity.OperatorSide.RoundsLost == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.RoundsLost(childComplexity), true
+
+	case "OperatorSide.roundsplayed":
+		if e.complexity.OperatorSide.RoundsPlayed == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.RoundsPlayed(childComplexity), true
+
+	case "OperatorSide.roundswon":
+		if e.complexity.OperatorSide.RoundsWon == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.RoundsWon(childComplexity), true
+
+	case "OperatorSide.statsdetail":
+		if e.complexity.OperatorSide.StatsDetail == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.StatsDetail(childComplexity), true
+
+	case "OperatorSide.timealivepermatch":
+		if e.complexity.OperatorSide.Timealivepermatch == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Timealivepermatch(childComplexity), true
+
+	case "OperatorSide.timedeadpermatch":
+		if e.complexity.OperatorSide.Timedeadpermatch == nil {
+			break
+		}
+
+		return e.complexity.OperatorSide.Timedeadpermatch(childComplexity), true
+
+	case "OperatorTeamRoles.attacker":
+		if e.complexity.OperatorTeamRoles.Attacker == nil {
+			break
+		}
+
+		return e.complexity.OperatorTeamRoles.Attacker(childComplexity), true
+
+	case "OperatorTeamRoles.defender":
+		if e.complexity.OperatorTeamRoles.Defender == nil {
+			break
+		}
+
+		return e.complexity.OperatorTeamRoles.Defender(childComplexity), true
+
 	case "Player.aliases":
 		if e.complexity.Player.Aliases == nil {
 			break
@@ -211,12 +719,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Player.Level(childComplexity), true
 
+	case "Player.maps":
+		if e.complexity.Player.Maps == nil {
+			break
+		}
+
+		return e.complexity.Player.Maps(childComplexity), true
+
 	case "Player.nickname":
 		if e.complexity.Player.NickName == nil {
 			break
 		}
 
 		return e.complexity.Player.NickName(childComplexity), true
+
+	case "Player.operators":
+		if e.complexity.Player.Operators == nil {
+			break
+		}
+
+		return e.complexity.Player.Operators(childComplexity), true
 
 	case "Player.platform":
 		if e.complexity.Player.Platform == nil {
@@ -232,6 +754,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Player.PlatformID(childComplexity), true
 
+	case "Player.ranked":
+		if e.complexity.Player.Ranked == nil {
+			break
+		}
+
+		return e.complexity.Player.Ranked(childComplexity), true
+
+	case "Player.summary":
+		if e.complexity.Player.Summary == nil {
+			break
+		}
+
+		return e.complexity.Player.Summary(childComplexity), true
+
 	case "Player.timeplayed":
 		if e.complexity.Player.TimePlayed == nil {
 			break
@@ -245,6 +781,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Player.Weapons(childComplexity), true
+
+	case "PlayerSearchResults.aliases":
+		if e.complexity.PlayerSearchResults.Aliases == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.Aliases(childComplexity), true
+
+	case "PlayerSearchResults._id":
+		if e.complexity.PlayerSearchResults.ID == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.ID(childComplexity), true
+
+	case "PlayerSearchResults.lastupdate":
+		if e.complexity.PlayerSearchResults.LastUpdate == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.LastUpdate(childComplexity), true
+
+	case "PlayerSearchResults.level":
+		if e.complexity.PlayerSearchResults.Level == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.Level(childComplexity), true
+
+	case "PlayerSearchResults.nickname":
+		if e.complexity.PlayerSearchResults.NickName == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.NickName(childComplexity), true
+
+	case "PlayerSearchResults.platform":
+		if e.complexity.PlayerSearchResults.Platform == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.Platform(childComplexity), true
+
+	case "PlayerSearchResults.platformid":
+		if e.complexity.PlayerSearchResults.PlatformID == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.PlatformID(childComplexity), true
+
+	case "PlayerSearchResults.ranked":
+		if e.complexity.PlayerSearchResults.Ranked == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.Ranked(childComplexity), true
+
+	case "PlayerSearchResults.timeplayed":
+		if e.complexity.PlayerSearchResults.TimePlayed == nil {
+			break
+		}
+
+		return e.complexity.PlayerSearchResults.TimePlayed(childComplexity), true
 
 	case "PrimaryWeapons.weapontypes":
 		if e.complexity.PrimaryWeapons.Weapontypes == nil {
@@ -289,12 +888,292 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Testquery(childComplexity, args["input"].(model.PlayerSearch)), true
 
+	case "RankedSeason.abandons":
+		if e.complexity.RankedSeason.Abandons == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Abandons(childComplexity), true
+
+	case "RankedSeason.deaths":
+		if e.complexity.RankedSeason.Deaths == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Deaths(childComplexity), true
+
+	case "RankedSeason.kills":
+		if e.complexity.RankedSeason.Kills == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Kills(childComplexity), true
+
+	case "RankedSeason.lastmatchresult":
+		if e.complexity.RankedSeason.LastMatchResult == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.LastMatchResult(childComplexity), true
+
+	case "RankedSeason.lastmatchmmrchange":
+		if e.complexity.RankedSeason.Lastmatchmmrchange == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Lastmatchmmrchange(childComplexity), true
+
+	case "RankedSeason.losses":
+		if e.complexity.RankedSeason.Losses == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Losses(childComplexity), true
+
+	case "RankedSeason.maxrank":
+		if e.complexity.RankedSeason.MaxRank == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.MaxRank(childComplexity), true
+
+	case "RankedSeason.maxmmr":
+		if e.complexity.RankedSeason.Maxmmr == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Maxmmr(childComplexity), true
+
+	case "RankedSeason.mmr":
+		if e.complexity.RankedSeason.Mmr == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Mmr(childComplexity), true
+
+	case "RankedSeason.rank":
+		if e.complexity.RankedSeason.Rank == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Rank(childComplexity), true
+
+	case "RankedSeason.season":
+		if e.complexity.RankedSeason.Season == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Season(childComplexity), true
+
+	case "RankedSeason.skillmean":
+		if e.complexity.RankedSeason.Skillmean == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Skillmean(childComplexity), true
+
+	case "RankedSeason.skillstdev":
+		if e.complexity.RankedSeason.Skillstdev == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Skillstdev(childComplexity), true
+
+	case "RankedSeason.wins":
+		if e.complexity.RankedSeason.Wins == nil {
+			break
+		}
+
+		return e.complexity.RankedSeason.Wins(childComplexity), true
+
 	case "SecondaryWeapons.weapontypes":
 		if e.complexity.SecondaryWeapons.Weapontypes == nil {
 			break
 		}
 
 		return e.complexity.SecondaryWeapons.Weapontypes(childComplexity), true
+
+	case "SummaryGameMode.teamroles":
+		if e.complexity.SummaryGameMode.TeamRoles == nil {
+			break
+		}
+
+		return e.complexity.SummaryGameMode.TeamRoles(childComplexity), true
+
+	case "SummaryGameModes.all":
+		if e.complexity.SummaryGameModes.All == nil {
+			break
+		}
+
+		return e.complexity.SummaryGameModes.All(childComplexity), true
+
+	case "SummaryGameModes.casual":
+		if e.complexity.SummaryGameModes.Casual == nil {
+			break
+		}
+
+		return e.complexity.SummaryGameModes.Casual(childComplexity), true
+
+	case "SummaryGameModes.ranked":
+		if e.complexity.SummaryGameModes.Ranked == nil {
+			break
+		}
+
+		return e.complexity.SummaryGameModes.Ranked(childComplexity), true
+
+	case "SummaryGameModes.unranked":
+		if e.complexity.SummaryGameModes.Unranked == nil {
+			break
+		}
+
+		return e.complexity.SummaryGameModes.Unranked(childComplexity), true
+
+	case "SummarySeason.assists":
+		if e.complexity.SummarySeason.Assists == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Assists(childComplexity), true
+
+	case "SummarySeason.death":
+		if e.complexity.SummarySeason.Death == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Death(childComplexity), true
+
+	case "SummarySeason.distanceperround":
+		if e.complexity.SummarySeason.Distanceperround == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Distanceperround(childComplexity), true
+
+	case "SummarySeason.headshots":
+		if e.complexity.SummarySeason.Headshots == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Headshots(childComplexity), true
+
+	case "SummarySeason.kills":
+		if e.complexity.SummarySeason.Kills == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Kills(childComplexity), true
+
+	case "SummarySeason.matcheslost":
+		if e.complexity.SummarySeason.MatchesLost == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.MatchesLost(childComplexity), true
+
+	case "SummarySeason.matchesplayed":
+		if e.complexity.SummarySeason.MatchesPlayed == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.MatchesPlayed(childComplexity), true
+
+	case "SummarySeason.matcheswon":
+		if e.complexity.SummarySeason.MatchesWon == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.MatchesWon(childComplexity), true
+
+	case "SummarySeason.meleekills":
+		if e.complexity.SummarySeason.MeleeKills == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.MeleeKills(childComplexity), true
+
+	case "SummarySeason.minutesplayed":
+		if e.complexity.SummarySeason.MinutesPlayed == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.MinutesPlayed(childComplexity), true
+
+	case "SummarySeason.openingdeaths":
+		if e.complexity.SummarySeason.OpeningDeaths == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.OpeningDeaths(childComplexity), true
+
+	case "SummarySeason.openingkills":
+		if e.complexity.SummarySeason.OpeningKills == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.OpeningKills(childComplexity), true
+
+	case "SummarySeason.roundslost":
+		if e.complexity.SummarySeason.RoundsLost == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.RoundsLost(childComplexity), true
+
+	case "SummarySeason.roundsplayed":
+		if e.complexity.SummarySeason.RoundsPlayed == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.RoundsPlayed(childComplexity), true
+
+	case "SummarySeason.roundswon":
+		if e.complexity.SummarySeason.RoundsWon == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.RoundsWon(childComplexity), true
+
+	case "SummarySeason.seasonnumber":
+		if e.complexity.SummarySeason.SeasonNumber == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.SeasonNumber(childComplexity), true
+
+	case "SummarySeason.seasonyear":
+		if e.complexity.SummarySeason.SeasonYear == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.SeasonYear(childComplexity), true
+
+	case "SummarySeason.timealivepermatch":
+		if e.complexity.SummarySeason.Timealivepermatch == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Timealivepermatch(childComplexity), true
+
+	case "SummarySeason.timedeadpermatch":
+		if e.complexity.SummarySeason.Timedeadpermatch == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Timedeadpermatch(childComplexity), true
+
+	case "SummarySeason.trades":
+		if e.complexity.SummarySeason.Trades == nil {
+			break
+		}
+
+		return e.complexity.SummarySeason.Trades(childComplexity), true
+
+	case "SummaryTeamRoles.all":
+		if e.complexity.SummaryTeamRoles.All == nil {
+			break
+		}
+
+		return e.complexity.SummaryTeamRoles.All(childComplexity), true
 
 	case "TimePlayed.lastmodified":
 		if e.complexity.TimePlayed.Lastmodified == nil {
@@ -479,9 +1358,187 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "cmd/api/graph/schema/schema.graphql", Input: `
+	{Name: "cmd/api/graph/schema/alias.graphql", Input: `type Alias {
+    name: String
+    date: Time
+}`, BuiltIn: false},
+	{Name: "cmd/api/graph/schema/maps.graphql", Input: `type Map {
+    statsdetail:       String
+    matchesplayed:     Int
+    roundsplayed:      Int
+    minutesplayed:     Int
+    matcheswon:        Int
+    matcheslost:       Int
+    roundswon:         Int
+    roundslost:        Int
+    kills:             Int
+    assists:           Int
+    death:             Int
+    headshots:         Int
+    meleekills:        Int
+    timealivepermatch: Float
+    timedeadpermatch:  Float
+    distanceperround:  Float
+}
 
-type Weapons {
+type MapsTeamRoles {
+    all:      [Map]
+    attacker: [Map]
+    defender: [Map]
+}
+
+type MapsGameMode {
+    type:      String
+    teamroles: MapsTeamRoles
+}
+
+type MapsGameModes {
+    all:      MapsGameMode
+    casual:   MapsGameMode
+    ranked:   MapsGameMode
+    unranked: MapsGameMode
+}`, BuiltIn: false},
+	{Name: "cmd/api/graph/schema/operators.graphql", Input: `type OperatorSide {
+    statsdetail:       String
+    matchesplayed:     Int
+    roundsplayed:      Int
+    minutesplayed:     Int
+    matcheswon:        Int
+    matcheslost:       Int
+    roundswon:         Int
+    roundslost:        Int
+    kills:             Int
+    assists:           Int
+    death:             Int
+    headshots:         Int
+    meleekills:        Int
+    timealivepermatch: Float
+    timedeadpermatch:  Float
+    distanceperround:  Float
+}
+
+type OperatorTeamRoles {
+    attacker: [OperatorSide]
+    defender: [OperatorSide]
+}
+
+type OperatorGameMode {
+    teamroles: OperatorTeamRoles
+}
+
+type OperatorGameModes {
+    all:      OperatorGameMode
+    casual:   OperatorGameMode
+    ranked:   OperatorGameMode
+    unranked: OperatorGameMode
+}`, BuiltIn: false},
+	{Name: "cmd/api/graph/schema/ranked.graphql", Input: `type RankedSeason {
+    season: Int
+    maxmmr: Float
+    skillmean: Float
+    deaths: Int
+    rank: Int
+    maxrank: Int
+    skillstdev: Float
+    kills: Int
+    lastmatchmmrchange: Float
+    abandons: Int
+    mmr: Float
+    lastmatchresult: Int
+    wins: Int
+    losses: Int
+}`, BuiltIn: false},
+	{Name: "cmd/api/graph/schema/schema.graphql", Input: `
+type Level {
+    value: String
+    lastmodified: Time
+}
+
+type TimePlayed {
+    value: String
+    lastmodified: Time
+}
+
+# Player Type (MAIN)
+type Player {
+    _id: String!
+    nickname: String!
+    platform: String!
+    platformid: String!
+    aliases: [Alias]!
+    weapons: WeaponsGameModes!
+    timeplayed: TimePlayed!
+    summary: SummaryGameModes!
+    ranked: [RankedSeason!]
+    operators: OperatorGameModes!
+    maps: MapsGameModes!
+    level: Level!
+    lastupdate: Time!
+}
+
+# Player Search Results
+type PlayerSearchResults {
+    _id: String!
+    nickname: String!
+    platform: String!
+    platformid: String!
+    aliases: [Alias]!
+    timeplayed: TimePlayed!
+    ranked: [RankedSeason!]!
+    level: Level!
+    lastupdate: Time!
+}
+
+input PlayerSearch {
+    name: String!
+    platform: String!
+}
+
+type Query {
+    playerquery(input: PlayerSearch!): Player
+    searchquery(input: PlayerSearch!): [PlayerSearchResults!]
+    testquery(input: PlayerSearch!): Player
+}
+
+scalar Time`, BuiltIn: false},
+	{Name: "cmd/api/graph/schema/summary.graphql", Input: `type SummarySeason {
+    seasonyear:        String
+    seasonnumber:      String
+    matchesplayed:     Int
+    roundsplayed:      Int
+    minutesplayed:     Int
+    matcheswon:        Int
+    matcheslost:       Int
+    roundswon:         Int
+    roundslost:        Int
+    kills:             Int
+    assists:           Int
+    death:             Int
+    headshots:         Int
+    meleekills:        Int
+    openingkills:      Int
+    openingdeaths:     Int
+    trades:            Int
+    timealivepermatch: Float
+    timedeadpermatch:  Float
+    distanceperround:  Float
+}
+
+type SummaryTeamRoles {
+    all: [SummarySeason]
+}
+
+type SummaryGameMode {
+    teamroles: SummaryTeamRoles
+}
+
+type SummaryGameModes {
+    casual:   SummaryGameMode
+    ranked:   SummaryGameMode
+    unranked: SummaryGameMode
+    all:      SummaryGameMode
+}`, BuiltIn: false},
+	{Name: "cmd/api/graph/schema/weapons.graphql", Input: `type Weapons {
     weaponname: String
     roundsplayed: Int
     roundswon: Int
@@ -526,52 +1583,7 @@ type WeaponsGameModes {
     casual:   WeaponsGameMode
     ranked:   WeaponsGameMode
     unranked: WeaponsGameMode
-}
-
-type Level {
-    value: String
-    lastmodified: Time
-}
-
-type TimePlayed {
-    value: String
-    lastmodified: Time
-}
-
-type Alias {
-    name: String
-    date: Time
-}
-
-# Player Type (MAIN)
-type Player {
-    _id: String!
-    nickname: String!
-    platform: String!
-    platformid: String!
-    aliases: [Alias]!
-    weapons: WeaponsGameModes!
-    timeplayed: TimePlayed!
-    #    summary: Summary!
-    #    ranked: [Ranked!]
-    #    operators: Operators!
-    #    maps: Maps!
-    level: Level!
-    lastupdate: Time!
-}
-
-input PlayerSearch {
-    name: String!
-    platform: String!
-}
-
-type Query {
-    playerquery(input: PlayerSearch!): Player
-    searchquery(input: PlayerSearch!): [Player!]
-    testquery(input: PlayerSearch!): Player
-}
-
-scalar Time`, BuiltIn: false},
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -803,6 +1815,1542 @@ func (ec *executionContext) _Level_lastmodified(ctx context.Context, field graph
 	res := resTmp.(*time.Time)
 	fc.Result = res
 	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_statsdetail(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StatsDetail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_matchesplayed(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_roundsplayed(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_minutesplayed(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinutesPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_matcheswon(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesWon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_matcheslost(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesLost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_roundswon(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsWon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_roundslost(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsLost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_kills(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_assists(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Assists, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_death(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Death, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_headshots(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Headshots, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_meleekills(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MeleeKills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_timealivepermatch(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Map().Timealivepermatch(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_timedeadpermatch(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Map().Timedeadpermatch(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Map_distanceperround(ctx context.Context, field graphql.CollectedField, obj *model.Map) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Map",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Map().Distanceperround(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsGameMode_type(ctx context.Context, field graphql.CollectedField, obj *model.MapsGameMode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsGameMode",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsGameMode_teamroles(ctx context.Context, field graphql.CollectedField, obj *model.MapsGameMode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsGameMode",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TeamRoles, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.MapsTeamRoles)
+	fc.Result = res
+	return ec.marshalOMapsTeamRoles2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsTeamRoles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsGameModes_all(ctx context.Context, field graphql.CollectedField, obj *model.MapsGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.All, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.MapsGameMode)
+	fc.Result = res
+	return ec.marshalOMapsGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsGameModes_casual(ctx context.Context, field graphql.CollectedField, obj *model.MapsGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Casual, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.MapsGameMode)
+	fc.Result = res
+	return ec.marshalOMapsGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsGameModes_ranked(ctx context.Context, field graphql.CollectedField, obj *model.MapsGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.MapsGameMode)
+	fc.Result = res
+	return ec.marshalOMapsGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsGameModes_unranked(ctx context.Context, field graphql.CollectedField, obj *model.MapsGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Unranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.MapsGameMode)
+	fc.Result = res
+	return ec.marshalOMapsGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsTeamRoles_all(ctx context.Context, field graphql.CollectedField, obj *model.MapsTeamRoles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsTeamRoles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.All, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.Map)
+	fc.Result = res
+	return ec.marshalOMap2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMap(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsTeamRoles_attacker(ctx context.Context, field graphql.CollectedField, obj *model.MapsTeamRoles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsTeamRoles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attacker, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.Map)
+	fc.Result = res
+	return ec.marshalOMap2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMap(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MapsTeamRoles_defender(ctx context.Context, field graphql.CollectedField, obj *model.MapsTeamRoles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MapsTeamRoles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Defender, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.Map)
+	fc.Result = res
+	return ec.marshalOMap2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMap(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorGameMode_teamroles(ctx context.Context, field graphql.CollectedField, obj *model.OperatorGameMode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorGameMode",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TeamRoles, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.OperatorTeamRoles)
+	fc.Result = res
+	return ec.marshalOOperatorTeamRoles2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorTeamRoles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorGameModes_all(ctx context.Context, field graphql.CollectedField, obj *model.OperatorGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.All, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.OperatorGameMode)
+	fc.Result = res
+	return ec.marshalOOperatorGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorGameModes_casual(ctx context.Context, field graphql.CollectedField, obj *model.OperatorGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Casual, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.OperatorGameMode)
+	fc.Result = res
+	return ec.marshalOOperatorGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorGameModes_ranked(ctx context.Context, field graphql.CollectedField, obj *model.OperatorGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.OperatorGameMode)
+	fc.Result = res
+	return ec.marshalOOperatorGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorGameModes_unranked(ctx context.Context, field graphql.CollectedField, obj *model.OperatorGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Unranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.OperatorGameMode)
+	fc.Result = res
+	return ec.marshalOOperatorGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_statsdetail(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StatsDetail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_matchesplayed(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_roundsplayed(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_minutesplayed(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinutesPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_matcheswon(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesWon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_matcheslost(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesLost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_roundswon(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsWon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_roundslost(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsLost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_kills(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_assists(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Assists, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_death(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Death, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_headshots(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Headshots, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_meleekills(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MeleeKills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_timealivepermatch(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.OperatorSide().Timealivepermatch(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_timedeadpermatch(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.OperatorSide().Timedeadpermatch(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorSide_distanceperround(ctx context.Context, field graphql.CollectedField, obj *model.OperatorSide) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorSide",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.OperatorSide().Distanceperround(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorTeamRoles_attacker(ctx context.Context, field graphql.CollectedField, obj *model.OperatorTeamRoles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorTeamRoles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attacker, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.OperatorSide)
+	fc.Result = res
+	return ec.marshalOOperatorSide2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorSide(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OperatorTeamRoles_defender(ctx context.Context, field graphql.CollectedField, obj *model.OperatorTeamRoles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OperatorTeamRoles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Defender, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.OperatorSide)
+	fc.Result = res
+	return ec.marshalOOperatorSide2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorSide(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Player__id(ctx context.Context, field graphql.CollectedField, obj *model.Player) (ret graphql.Marshaler) {
@@ -1050,6 +3598,143 @@ func (ec *executionContext) _Player_timeplayed(ctx context.Context, field graphq
 	return ec.marshalNTimePlayed2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐTimePlayed(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Player_summary(ctx context.Context, field graphql.CollectedField, obj *model.Player) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Player",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Summary, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SummaryGameModes)
+	fc.Result = res
+	return ec.marshalNSummaryGameModes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameModes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Player_ranked(ctx context.Context, field graphql.CollectedField, obj *model.Player) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Player",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RankedSeason)
+	fc.Result = res
+	return ec.marshalORankedSeason2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeasonᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Player_operators(ctx context.Context, field graphql.CollectedField, obj *model.Player) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Player",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Operators, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.OperatorGameModes)
+	fc.Result = res
+	return ec.marshalNOperatorGameModes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameModes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Player_maps(ctx context.Context, field graphql.CollectedField, obj *model.Player) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Player",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Maps, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.MapsGameModes)
+	fc.Result = res
+	return ec.marshalNMapsGameModes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameModes(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Player_level(ctx context.Context, field graphql.CollectedField, obj *model.Player) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1094,6 +3779,321 @@ func (ec *executionContext) _Player_lastupdate(ctx context.Context, field graphq
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "Player",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastUpdate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults__id(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_nickname(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NickName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_platform(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Platform, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_platformid(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PlatformID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_aliases(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Aliases, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Alias)
+	fc.Result = res
+	return ec.marshalNAlias2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐAlias(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_timeplayed(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TimePlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TimePlayed)
+	fc.Result = res
+	return ec.marshalNTimePlayed2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐTimePlayed(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_ranked(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RankedSeason)
+	fc.Result = res
+	return ec.marshalNRankedSeason2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeasonᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_level(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Level, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Level)
+	fc.Result = res
+	return ec.marshalNLevel2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐLevel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlayerSearchResults_lastupdate(ctx context.Context, field graphql.CollectedField, obj *model.PlayerSearchResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlayerSearchResults",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -1225,9 +4225,9 @@ func (ec *executionContext) _Query_searchquery(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Player)
+	res := resTmp.([]*model.PlayerSearchResults)
 	fc.Result = res
-	return ec.marshalOPlayer2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerᚄ(ctx, field.Selections, res)
+	return ec.marshalOPlayerSearchResults2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerSearchResultsᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_testquery(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1340,6 +4340,454 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _RankedSeason_season(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Season, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_maxmmr(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RankedSeason().Maxmmr(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_skillmean(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RankedSeason().Skillmean(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_deaths(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deaths, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_rank(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rank, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_maxrank(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxRank, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_skillstdev(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RankedSeason().Skillstdev(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_kills(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_lastmatchmmrchange(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RankedSeason().Lastmatchmmrchange(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_abandons(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Abandons, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_mmr(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RankedSeason().Mmr(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_lastmatchresult(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastMatchResult, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_wins(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Wins, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RankedSeason_losses(ctx context.Context, field graphql.CollectedField, obj *model.RankedSeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RankedSeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Losses, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SecondaryWeapons_weapontypes(ctx context.Context, field graphql.CollectedField, obj *model.SecondaryWeapons) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1370,6 +4818,838 @@ func (ec *executionContext) _SecondaryWeapons_weapontypes(ctx context.Context, f
 	res := resTmp.(*model.WeaponTypes)
 	fc.Result = res
 	return ec.marshalOWeaponTypes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐWeaponTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummaryGameMode_teamroles(ctx context.Context, field graphql.CollectedField, obj *model.SummaryGameMode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummaryGameMode",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TeamRoles, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.SummaryTeamRoles)
+	fc.Result = res
+	return ec.marshalOSummaryTeamRoles2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryTeamRoles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummaryGameModes_casual(ctx context.Context, field graphql.CollectedField, obj *model.SummaryGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummaryGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Casual, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.SummaryGameMode)
+	fc.Result = res
+	return ec.marshalOSummaryGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummaryGameModes_ranked(ctx context.Context, field graphql.CollectedField, obj *model.SummaryGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummaryGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.SummaryGameMode)
+	fc.Result = res
+	return ec.marshalOSummaryGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummaryGameModes_unranked(ctx context.Context, field graphql.CollectedField, obj *model.SummaryGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummaryGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Unranked, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.SummaryGameMode)
+	fc.Result = res
+	return ec.marshalOSummaryGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummaryGameModes_all(ctx context.Context, field graphql.CollectedField, obj *model.SummaryGameModes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummaryGameModes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.All, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.SummaryGameMode)
+	fc.Result = res
+	return ec.marshalOSummaryGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_seasonyear(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeasonYear, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_seasonnumber(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeasonNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_matchesplayed(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_roundsplayed(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_minutesplayed(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinutesPlayed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_matcheswon(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesWon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_matcheslost(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MatchesLost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_roundswon(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsWon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_roundslost(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoundsLost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_kills(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_assists(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Assists, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_death(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Death, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_headshots(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Headshots, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_meleekills(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MeleeKills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_openingkills(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OpeningKills, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_openingdeaths(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OpeningDeaths, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_trades(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Trades, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_timealivepermatch(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SummarySeason().Timealivepermatch(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_timedeadpermatch(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SummarySeason().Timedeadpermatch(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummarySeason_distanceperround(ctx context.Context, field graphql.CollectedField, obj *model.SummarySeason) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummarySeason",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SummarySeason().Distanceperround(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SummaryTeamRoles_all(ctx context.Context, field graphql.CollectedField, obj *model.SummaryTeamRoles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SummaryTeamRoles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.All, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.SummarySeason)
+	fc.Result = res
+	return ec.marshalOSummarySeason2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummarySeason(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TimePlayed_value(ctx context.Context, field graphql.CollectedField, obj *model.TimePlayed) (ret graphql.Marshaler) {
@@ -3275,6 +7555,570 @@ func (ec *executionContext) _Level(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var mapImplementors = []string{"Map"}
+
+func (ec *executionContext) _Map(ctx context.Context, sel ast.SelectionSet, obj *model.Map) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mapImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Map")
+		case "statsdetail":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_statsdetail(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matchesplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_matchesplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundsplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_roundsplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "minutesplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_minutesplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matcheswon":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_matcheswon(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matcheslost":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_matcheslost(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundswon":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_roundswon(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundslost":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_roundslost(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "kills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_kills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "assists":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_assists(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "death":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_death(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "headshots":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_headshots(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "meleekills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Map_meleekills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "timealivepermatch":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Map_timealivepermatch(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "timedeadpermatch":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Map_timedeadpermatch(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "distanceperround":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Map_distanceperround(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mapsGameModeImplementors = []string{"MapsGameMode"}
+
+func (ec *executionContext) _MapsGameMode(ctx context.Context, sel ast.SelectionSet, obj *model.MapsGameMode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mapsGameModeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MapsGameMode")
+		case "type":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsGameMode_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "teamroles":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsGameMode_teamroles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mapsGameModesImplementors = []string{"MapsGameModes"}
+
+func (ec *executionContext) _MapsGameModes(ctx context.Context, sel ast.SelectionSet, obj *model.MapsGameModes) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mapsGameModesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MapsGameModes")
+		case "all":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsGameModes_all(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "casual":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsGameModes_casual(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "ranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsGameModes_ranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "unranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsGameModes_unranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mapsTeamRolesImplementors = []string{"MapsTeamRoles"}
+
+func (ec *executionContext) _MapsTeamRoles(ctx context.Context, sel ast.SelectionSet, obj *model.MapsTeamRoles) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mapsTeamRolesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MapsTeamRoles")
+		case "all":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsTeamRoles_all(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "attacker":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsTeamRoles_attacker(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "defender":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MapsTeamRoles_defender(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var operatorGameModeImplementors = []string{"OperatorGameMode"}
+
+func (ec *executionContext) _OperatorGameMode(ctx context.Context, sel ast.SelectionSet, obj *model.OperatorGameMode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, operatorGameModeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OperatorGameMode")
+		case "teamroles":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorGameMode_teamroles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var operatorGameModesImplementors = []string{"OperatorGameModes"}
+
+func (ec *executionContext) _OperatorGameModes(ctx context.Context, sel ast.SelectionSet, obj *model.OperatorGameModes) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, operatorGameModesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OperatorGameModes")
+		case "all":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorGameModes_all(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "casual":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorGameModes_casual(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "ranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorGameModes_ranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "unranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorGameModes_unranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var operatorSideImplementors = []string{"OperatorSide"}
+
+func (ec *executionContext) _OperatorSide(ctx context.Context, sel ast.SelectionSet, obj *model.OperatorSide) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, operatorSideImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OperatorSide")
+		case "statsdetail":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_statsdetail(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matchesplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_matchesplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundsplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_roundsplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "minutesplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_minutesplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matcheswon":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_matcheswon(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matcheslost":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_matcheslost(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundswon":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_roundswon(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundslost":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_roundslost(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "kills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_kills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "assists":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_assists(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "death":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_death(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "headshots":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_headshots(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "meleekills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorSide_meleekills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "timealivepermatch":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._OperatorSide_timealivepermatch(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "timedeadpermatch":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._OperatorSide_timedeadpermatch(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "distanceperround":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._OperatorSide_distanceperround(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var operatorTeamRolesImplementors = []string{"OperatorTeamRoles"}
+
+func (ec *executionContext) _OperatorTeamRoles(ctx context.Context, sel ast.SelectionSet, obj *model.OperatorTeamRoles) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, operatorTeamRolesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OperatorTeamRoles")
+		case "attacker":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorTeamRoles_attacker(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "defender":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OperatorTeamRoles_defender(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var playerImplementors = []string{"Player"}
 
 func (ec *executionContext) _Player(ctx context.Context, sel ast.SelectionSet, obj *model.Player) graphql.Marshaler {
@@ -3355,6 +8199,43 @@ func (ec *executionContext) _Player(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "summary":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Player_summary(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Player_ranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "operators":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Player_operators(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "maps":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Player_maps(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "level":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Player_level(ctx, field, obj)
@@ -3368,6 +8249,117 @@ func (ec *executionContext) _Player(ctx context.Context, sel ast.SelectionSet, o
 		case "lastupdate":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Player_lastupdate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var playerSearchResultsImplementors = []string{"PlayerSearchResults"}
+
+func (ec *executionContext) _PlayerSearchResults(ctx context.Context, sel ast.SelectionSet, obj *model.PlayerSearchResults) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, playerSearchResultsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PlayerSearchResults")
+		case "_id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults__id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "nickname":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_nickname(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "platform":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_platform(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "platformid":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_platformid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "aliases":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_aliases(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "timeplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_timeplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_ranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "level":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_level(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastupdate":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PlayerSearchResults_lastupdate(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -3528,6 +8520,175 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
+var rankedSeasonImplementors = []string{"RankedSeason"}
+
+func (ec *executionContext) _RankedSeason(ctx context.Context, sel ast.SelectionSet, obj *model.RankedSeason) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, rankedSeasonImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RankedSeason")
+		case "season":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_season(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "maxmmr":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RankedSeason_maxmmr(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "skillmean":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RankedSeason_skillmean(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "deaths":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_deaths(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "rank":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_rank(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "maxrank":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_maxrank(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "skillstdev":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RankedSeason_skillstdev(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "kills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_kills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "lastmatchmmrchange":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RankedSeason_lastmatchmmrchange(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "abandons":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_abandons(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "mmr":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RankedSeason_mmr(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "lastmatchresult":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_lastmatchresult(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "wins":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_wins(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "losses":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RankedSeason_losses(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var secondaryWeaponsImplementors = []string{"SecondaryWeapons"}
 
 func (ec *executionContext) _SecondaryWeapons(ctx context.Context, sel ast.SelectionSet, obj *model.SecondaryWeapons) graphql.Marshaler {
@@ -3555,6 +8716,302 @@ func (ec *executionContext) _SecondaryWeapons(ctx context.Context, sel ast.Selec
 				return innerFunc(ctx)
 
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var summaryGameModeImplementors = []string{"SummaryGameMode"}
+
+func (ec *executionContext) _SummaryGameMode(ctx context.Context, sel ast.SelectionSet, obj *model.SummaryGameMode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, summaryGameModeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SummaryGameMode")
+		case "teamroles":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummaryGameMode_teamroles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var summaryGameModesImplementors = []string{"SummaryGameModes"}
+
+func (ec *executionContext) _SummaryGameModes(ctx context.Context, sel ast.SelectionSet, obj *model.SummaryGameModes) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, summaryGameModesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SummaryGameModes")
+		case "casual":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummaryGameModes_casual(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "ranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummaryGameModes_ranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "unranked":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummaryGameModes_unranked(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "all":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummaryGameModes_all(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var summarySeasonImplementors = []string{"SummarySeason"}
+
+func (ec *executionContext) _SummarySeason(ctx context.Context, sel ast.SelectionSet, obj *model.SummarySeason) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, summarySeasonImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SummarySeason")
+		case "seasonyear":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_seasonyear(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "seasonnumber":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_seasonnumber(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matchesplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_matchesplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundsplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_roundsplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "minutesplayed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_minutesplayed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matcheswon":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_matcheswon(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "matcheslost":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_matcheslost(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundswon":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_roundswon(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "roundslost":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_roundslost(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "kills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_kills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "assists":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_assists(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "death":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_death(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "headshots":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_headshots(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "meleekills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_meleekills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "openingkills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_openingkills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "openingdeaths":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_openingdeaths(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "trades":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummarySeason_trades(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "timealivepermatch":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SummarySeason_timealivepermatch(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "timedeadpermatch":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SummarySeason_timedeadpermatch(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "distanceperround":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SummarySeason_distanceperround(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var summaryTeamRolesImplementors = []string{"SummaryTeamRoles"}
+
+func (ec *executionContext) _SummaryTeamRoles(ctx context.Context, sel ast.SelectionSet, obj *model.SummaryTeamRoles) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, summaryTeamRolesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SummaryTeamRoles")
+		case "all":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SummaryTeamRoles_all(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4363,19 +9820,93 @@ func (ec *executionContext) marshalNLevel2ᚖgithubᚗcomᚋeliassebastianᚋgor
 	return ec._Level(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPlayer2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayer(ctx context.Context, sel ast.SelectionSet, v *model.Player) graphql.Marshaler {
+func (ec *executionContext) marshalNMapsGameModes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameModes(ctx context.Context, sel ast.SelectionSet, v *model.MapsGameModes) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._Player(ctx, sel, v)
+	return ec._MapsGameModes(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOperatorGameModes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameModes(ctx context.Context, sel ast.SelectionSet, v *model.OperatorGameModes) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._OperatorGameModes(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPlayerSearch2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerSearch(ctx context.Context, v interface{}) (model.PlayerSearch, error) {
 	res, err := ec.unmarshalInputPlayerSearch(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPlayerSearchResults2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerSearchResults(ctx context.Context, sel ast.SelectionSet, v *model.PlayerSearchResults) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PlayerSearchResults(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNRankedSeason2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeasonᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.RankedSeason) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRankedSeason2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeason(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNRankedSeason2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeason(ctx context.Context, sel ast.SelectionSet, v *model.RankedSeason) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._RankedSeason(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4391,6 +9922,16 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNSummaryGameModes2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameModes(ctx context.Context, sel ast.SelectionSet, v *model.SummaryGameModes) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SummaryGameModes(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
@@ -4730,6 +10271,16 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
 	if v == nil {
 		return nil, nil
@@ -4746,7 +10297,11 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOPlayer2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Player) graphql.Marshaler {
+func (ec *executionContext) marshalOMap2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMap(ctx context.Context, sel ast.SelectionSet, v model.Map) graphql.Marshaler {
+	return ec._Map(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOMap2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMap(ctx context.Context, sel ast.SelectionSet, v []model.Map) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4773,7 +10328,116 @@ func (ec *executionContext) marshalOPlayer2ᚕᚖgithubᚗcomᚋeliassebastian�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPlayer2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayer(ctx, sel, v[i])
+			ret[i] = ec.marshalOMap2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMap(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMapsGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsGameMode(ctx context.Context, sel ast.SelectionSet, v model.MapsGameMode) graphql.Marshaler {
+	return ec._MapsGameMode(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOMapsTeamRoles2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐMapsTeamRoles(ctx context.Context, sel ast.SelectionSet, v model.MapsTeamRoles) graphql.Marshaler {
+	return ec._MapsTeamRoles(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOOperatorGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorGameMode(ctx context.Context, sel ast.SelectionSet, v model.OperatorGameMode) graphql.Marshaler {
+	return ec._OperatorGameMode(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOOperatorSide2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorSide(ctx context.Context, sel ast.SelectionSet, v model.OperatorSide) graphql.Marshaler {
+	return ec._OperatorSide(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOOperatorSide2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorSide(ctx context.Context, sel ast.SelectionSet, v []model.OperatorSide) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOOperatorSide2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorSide(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOOperatorTeamRoles2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐOperatorTeamRoles(ctx context.Context, sel ast.SelectionSet, v model.OperatorTeamRoles) graphql.Marshaler {
+	return ec._OperatorTeamRoles(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOPlayer2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayer(ctx context.Context, sel ast.SelectionSet, v *model.Player) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Player(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOPlayerSearchResults2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerSearchResultsᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PlayerSearchResults) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPlayerSearchResults2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayerSearchResults(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4793,18 +10457,58 @@ func (ec *executionContext) marshalOPlayer2ᚕᚖgithubᚗcomᚋeliassebastian�
 	return ret
 }
 
-func (ec *executionContext) marshalOPlayer2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPlayer(ctx context.Context, sel ast.SelectionSet, v *model.Player) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Player(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOPrimaryWeapons2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐPrimaryWeapons(ctx context.Context, sel ast.SelectionSet, v *model.PrimaryWeapons) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._PrimaryWeapons(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalORankedSeason2ᚕᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeasonᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.RankedSeason) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRankedSeason2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐRankedSeason(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOSecondaryWeapons2ᚖgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSecondaryWeapons(ctx context.Context, sel ast.SelectionSet, v *model.SecondaryWeapons) graphql.Marshaler {
@@ -4838,6 +10542,59 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOSummaryGameMode2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryGameMode(ctx context.Context, sel ast.SelectionSet, v model.SummaryGameMode) graphql.Marshaler {
+	return ec._SummaryGameMode(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOSummarySeason2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummarySeason(ctx context.Context, sel ast.SelectionSet, v model.SummarySeason) graphql.Marshaler {
+	return ec._SummarySeason(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOSummarySeason2ᚕgithubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummarySeason(ctx context.Context, sel ast.SelectionSet, v []model.SummarySeason) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSummarySeason2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummarySeason(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOSummaryTeamRoles2githubᚗcomᚋeliassebastianᚋgor6ᚑapiᚋcmdᚋapiᚋgraphᚋmodelsᚐSummaryTeamRoles(ctx context.Context, sel ast.SelectionSet, v model.SummaryTeamRoles) graphql.Marshaler {
+	return ec._SummaryTeamRoles(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {

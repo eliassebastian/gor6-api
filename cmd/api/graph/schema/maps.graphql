@@ -1,0 +1,36 @@
+type Map {
+    statsdetail:       String
+    matchesplayed:     Int
+    roundsplayed:      Int
+    minutesplayed:     Int
+    matcheswon:        Int
+    matcheslost:       Int
+    roundswon:         Int
+    roundslost:        Int
+    kills:             Int
+    assists:           Int
+    death:             Int
+    headshots:         Int
+    meleekills:        Int
+    timealivepermatch: Float
+    timedeadpermatch:  Float
+    distanceperround:  Float
+}
+
+type MapsTeamRoles {
+    all:      [Map]
+    attacker: [Map]
+    defender: [Map]
+}
+
+type MapsGameMode {
+    type:      String
+    teamroles: MapsTeamRoles
+}
+
+type MapsGameModes {
+    all:      MapsGameMode
+    casual:   MapsGameMode
+    ranked:   MapsGameMode
+    unranked: MapsGameMode
+}

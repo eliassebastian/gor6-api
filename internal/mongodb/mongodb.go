@@ -3,10 +3,12 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"fmt"
 	model "github.com/eliassebastian/gor6-api/cmd/api/graph/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
 
 type MongoClient struct {
@@ -46,6 +48,7 @@ func (c *MongoClient) Close() {
 }
 
 func (c *MongoClient) SearchPlayers(ctx context.Context, p, n string) ([]*model.PlayerSearchResults, error) {
+	fmt.Println("Search Players", n)
 	//text search for name
 	filter := bson.M{
 		"$text": bson.M{
@@ -55,9 +58,25 @@ func (c *MongoClient) SearchPlayers(ctx context.Context, p, n string) ([]*model.
 	//Limit returns to 25 results
 	opts := options.Find().SetLimit(25)
 	//projection - fields to return from search (_id included)
+
+	//nickname: String!
+	//platform: String!
+	//platformid: String!
+	//aliases: [Alias]!
+	//timeplayed: TimePlayed!
+	//ranked: [RankedSeason!]!
+	//level: Level!
+	//lastupdate: Time!
+
 	opts.SetProjection(bson.D{
-		{"item", 1},
-		{"status", 1},
+		{"nickname", 1},
+		{"platform", 1},
+		{"platformid", 1},
+		{"aliases", 1},
+		{"timeplayed", 1},
+		{"ranked", 1},
+		{"level", 1},
+		{"lastupdate", 1},
 	})
 	//sort
 	opts.SetSort(
@@ -71,13 +90,19 @@ func (c *MongoClient) SearchPlayers(ctx context.Context, p, n string) ([]*model.
 		return nil, err
 	}
 	//decode into slice of players
-	var articles []*model.PlayerSearchResults
-	de := cursor.All(ctx, articles)
-	if de != nil {
-		return nil, de
+	var result []*model.PlayerSearchResults
+	for cursor.Next(ctx) {
+		var player *model.PlayerSearchResults
+		err := cursor.Decode(&player)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		result = append(result, player)
 	}
 
-	return articles, nil
+	fmt.Println(result)
+	return result, nil
 }
 
 func (c *MongoClient) NewPlayer(ctx context.Context, p string, document *model.Player) error {
