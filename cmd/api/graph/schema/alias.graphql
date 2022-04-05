@@ -1,4 +1,0 @@
-type Alias {
-    name: String
-    date: Time
-}

@@ -5,7 +5,7 @@ type WeaponsModel struct {
 	Platforms WeaponsPlatforms `json:"platforms"`
 }
 
-type Weapons struct {
+type Weapon struct {
 	WeaponName          *string  `json:"weaponName"`
 	RoundsPlayed        *int     `json:"roundsPlayed"`
 	RoundsWon           *int     `json:"roundsWon"`
@@ -16,20 +16,16 @@ type Weapons struct {
 }
 
 type WeaponTypes struct {
-	Weapons []*Weapons `json:"weapons"`
+	Weapons []*Weapon `json:"weapons"`
 }
 
-type SecondaryWeapons struct {
-	WeaponTypes []*WeaponTypes `json:"weaponTypes"`
-}
-
-type PrimaryWeapons struct {
+type Weapons struct {
 	WeaponTypes []*WeaponTypes `json:"weaponTypes"`
 }
 
 type WeaponSlots struct {
-	SecondaryWeapons *SecondaryWeapons `json:"secondaryWeapons"`
-	PrimaryWeapons   *PrimaryWeapons   `json:"primaryWeapons"`
+	SecondaryWeapons *Weapons `json:"secondaryWeapons"`
+	PrimaryWeapons   *Weapons `json:"primaryWeapons"`
 }
 
 type WeaponsAll struct {
@@ -52,7 +48,7 @@ type WeaponsGameModes struct {
 }
 
 type WeaponsPlatform struct {
-	GameModes *WeaponsGameModes `json:"gameModes"`
+	GameModes WeaponsGameModes `json:"gameModes"`
 }
 
 type WeaponsPlatforms struct {

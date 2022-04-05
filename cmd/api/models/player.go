@@ -21,10 +21,10 @@ type Player struct {
 	NickName   string             `json:"nickName"`
 	LastUpdate time.Time          `json:"lastUpdate"`
 	TimePlayed *TimePlayed        `json:"timePlayed"`
-	Aliases    []*Alias           `json:"aliases"`
+	Aliases    *[]Alias           `json:"aliases"`
 	Level      *Level             `json:"level"`
 	Summary    *SummaryGameModes  `json:"summary,omitempty"`
-	Ranked     []*RankedSeason    `json:"ranked,omitempty"`
+	Ranked     *[]RankedSeason    `json:"ranked,omitempty"`
 	Weapons    *WeaponsGameModes  `json:"weapons,omitempty"`
 	Operators  *OperatorGameModes `json:"operators,omitempty"`
 	Maps       *MapsGameModes     `json:"maps,omitempty"`

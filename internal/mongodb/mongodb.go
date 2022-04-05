@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	model "github.com/eliassebastian/gor6-api/cmd/api/graph/models"
+	"github.com/eliassebastian/gor6-api/cmd/api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
