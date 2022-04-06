@@ -92,6 +92,56 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 	return false, nil, nil
 }
 
+func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=20211206&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate())
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		log.Println("error fetching player trends 1")
+		wg.Done()
+		return
+	}
+
+	req.Header = pc.getHeader()
+	res, err := pc.hc.Do(req)
+	if err != nil {
+		log.Println("error fetching player trends 2", err)
+		wg.Done()
+		return
+	}
+
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		fmt.Println("error fetching player trends 3", res.Status)
+		wg.Done()
+		return
+	}
+
+	var m model.TrendsModel
+	de := json.NewDecoder(res.Body).Decode(&m)
+	if de != nil {
+		log.Println("error fetching player trends 4", de)
+		wg.Done()
+		return
+	}
+
+	var wl model.TrendsPlatform
+	switch p {
+	case "uplay":
+		wl = m.Platforms.Pc
+	case "psn":
+		wl = m.Platforms.Ps4
+	case "xbl":
+		wl = m.Platforms.Xbox
+	default:
+		log.Println("error fetching player map 5")
+		wg.Done()
+		return
+	}
+
+	player.Trends = &wl.GameModes
+	wg.Done()
+}
+
 func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
