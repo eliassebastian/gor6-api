@@ -93,7 +93,7 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 }
 
 func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=%s&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate(-8), getDate(-1))
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=%s&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate(-7), getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player trends 1")
