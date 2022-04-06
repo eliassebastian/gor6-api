@@ -460,11 +460,8 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 	})
 
 	if err := g.Wait(); err != nil {
-		fmt.Println("error found in one goroutine - exiting now")
 		return nil, err
 	}
-
-	fmt.Println("successfully fetched player")
 
 	return player, nil
 }
