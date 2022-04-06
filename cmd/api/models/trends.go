@@ -1,21 +1,21 @@
 package model
 
 type TrendsRole struct {
-	Type                   string    `json:"type"`
-	StatsDetail            string    `json:"statsDetail"`
-	StatsPeriod            []string  `json:"statsPeriod"`
-	MatchesPlayed          []int     `json:"matchesPlayed"`
-	RoundsPlayed           []int     `json:"roundsPlayed"`
-	MinutesPlayed          []int     `json:"minutesPlayed"`
-	MatchesWon             []int     `json:"matchesWon"`
-	MatchesLost            []int     `json:"matchesLost"`
-	RoundsWon              []int     `json:"roundsWon"`
-	RoundsLost             []int     `json:"roundsLost"`
-	Kills                  []int     `json:"kills"`
-	Assists                []int     `json:"assists"`
-	Death                  []int     `json:"death"`
-	Headshots              []int     `json:"headshots"`
-	MeleeKills             []int     `json:"meleeKills"`
+	//Type                   string    `json:"type"`
+	//StatsDetail            string    `json:"statsDetail"`
+	StatsPeriod   []string `json:"statsPeriod"`
+	MatchesPlayed []int    `json:"matchesPlayed"`
+	RoundsPlayed  []int    `json:"roundsPlayed"`
+	//MinutesPlayed          []int     `json:"minutesPlayed"`
+	MatchesWon  []int `json:"matchesWon"`
+	MatchesLost []int `json:"matchesLost"`
+	RoundsWon   []int `json:"roundsWon"`
+	RoundsLost  []int `json:"roundsLost"`
+	Kills       []int `json:"kills"`
+	//Assists                []int     `json:"assists"`
+	Death []int `json:"death"`
+	//Headshots              []int     `json:"headshots"`
+	//MeleeKills             []int     `json:"meleeKills"`
 	TeamKills              []int     `json:"teamKills"`
 	OpeningKills           []int     `json:"openingKills"`
 	OpeningDeaths          []int     `json:"openingDeaths"`
@@ -36,9 +36,9 @@ type TrendsRole struct {
 	RoundsSurvived         []float32 `json:"roundsSurvived"`
 	RoundsWithAnAce        []float32 `json:"roundsWithAnAce"`
 	RoundsWithClutch       []float32 `json:"roundsWithClutch"`
-	TimeAlivePerMatch      []float32 `json:"timeAlivePerMatch"`
-	TimeDeadPerMatch       []float32 `json:"timeDeadPerMatch"`
-	DistancePerRound       []float32 `json:"distancePerRound"`
+	//TimeAlivePerMatch      []float32 `json:"timeAlivePerMatch"`
+	//TimeDeadPerMatch       []float32 `json:"timeDeadPerMatch"`
+	//DistancePerRound       []float32 `json:"distancePerRound"`
 }
 
 type TrendsRoles struct {

@@ -9,6 +9,7 @@ import (
 	"github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/cmd/api/response"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
+	"golang.org/x/sync/errgroup"
 	"log"
 	"net/http"
 	"sync"
@@ -92,36 +93,28 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 	return false, nil, nil
 }
 
-func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=%s&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate(-7), getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player trends 1")
-		wg.Done()
-		return
+		return err
 	}
 
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player trends 2", err)
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("error fetching player trends 3", res.Status)
-		wg.Done()
-		return
+		return errors.New("(trends) response status code is not 200")
 	}
 
 	var m model.TrendsModel
 	de := json.NewDecoder(res.Body).Decode(&m)
 	if de != nil {
-		log.Println("error fetching player trends 4", de)
-		wg.Done()
-		return
+		return de
 	}
 
 	var wl model.TrendsPlatform
@@ -133,44 +126,34 @@ func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, wg *sync.Wait
 	case "xbl":
 		wl = m.Platforms.Xbox
 	default:
-		log.Println("error fetching player map 5")
-		wg.Done()
-		return
+		return errors.New("error fetching trends platform")
 	}
 
 	player.Trends = &wl.GameModes
-	wg.Done()
+	return nil
 }
 
-func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player map 1")
-		wg.Done()
-		return
+		return err
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player map 2", err)
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("error fetching player map 3", res.Status)
-		wg.Done()
-		return
+		return errors.New("(map) response status code is not 200")
 	}
 
 	var m model.MapsModel
 	de := json.NewDecoder(res.Body).Decode(&m)
 	if de != nil {
-		log.Println("error fetching player map 4", de)
-		wg.Done()
-		return
+		return de
 	}
 
 	var wl model.MapsPlatform
@@ -182,44 +165,34 @@ func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGr
 	case "xbl":
 		wl = m.Platforms.Xbox
 	default:
-		log.Println("error fetching player map 5")
-		wg.Done()
-		return
+		return errors.New("fetching map platform error")
 	}
 
 	player.Maps = &wl.GameModes
-	wg.Done()
+	return nil
 }
 
-func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all&platform=%s&teamRole=all&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player weapon specific 1")
-		wg.Done()
-		return
+		return err
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player weapon 2", err)
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("error fetching player weapon 3", res.Status)
-		wg.Done()
-		return
+		return errors.New("response status code is not 200")
 	}
 
 	var wm model.WeaponsModel
 	de := json.NewDecoder(res.Body).Decode(&wm)
 	if de != nil {
-		log.Println("error fetching player weapon 5", de)
-		wg.Done()
-		return
+		return de
 	}
 
 	var wl model.WeaponsPlatform
@@ -231,45 +204,34 @@ func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.Wai
 	case "xbl":
 		wl = wm.Platforms.Xbox
 	default:
-		log.Println("error fetching player level 5")
-		wg.Done()
-		return
+		return errors.New("weapons platform fetch error")
 	}
 
 	player.Weapons = &wl.GameModes
-	fmt.Println("weapons done")
-	wg.Done()
+	return nil
 }
 
-func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player operator 1", err)
-		wg.Done()
-		return
+		return err
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player operator 2", err)
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("error fetching player operator 3", res.Status)
-		wg.Done()
-		return
+		return errors.New("response status code is not 200")
 	}
 
 	var m model.OperatorModel
 	de := json.NewDecoder(res.Body).Decode(&m)
 	if de != nil {
-		log.Println("error fetching player operator 4", de)
-		wg.Done()
-		return
+		return de
 	}
 
 	var wl model.OperatorPlatform
@@ -281,45 +243,35 @@ func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.W
 	case "xbl":
 		wl = m.Platforms.Xbox
 	default:
-		log.Println("error fetching player operator 5")
-		wg.Done()
-		return
+		return errors.New("operator platform error")
 	}
 
 	player.Operators = &wl.GameModes
-	wg.Done()
+	return nil
 }
 
-func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/spaces/%s/sandboxes/%s/r6karma/player_skill_records?board_ids=pvp_ranked&season_ids=-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19&region_ids=ncsa&profile_ids=%s", getSpaceId(p), getPlatformURL(p), id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player ranked 1")
-		wg.Done()
-		return
+		return err
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	fmt.Println(res.Request.Header)
 	if err != nil {
-		fmt.Println("error fetching player ranked 2", err)
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("error fetching player summary 3", res.Status)
-		wg.Done()
-		return
+		return errors.New("response status code is not 200")
 	}
 
 	var m model.RankedModel
 	de := json.NewDecoder(res.Body).Decode(&m)
 	if de != nil {
-		log.Println("error fetching player level 5", de)
-		wg.Done()
-		return
+		return de
 	}
 
 	var seasons []model.RankedSeason
@@ -328,59 +280,51 @@ func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, wg *sync.Wait
 	}
 
 	player.Ranked = &seasons
-	wg.Done()
+	return nil
 }
 
-func (pc *PlayerController) fetchPlayerSummarySpecific(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
-	fmt.Println(id, p)
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/summary/%s?gameMode=all,ranked,unranked,casual&platform=%s&startDate=20210811&endDate=20211214", id, model.PlatformURLNames2[p])
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		log.Println("error fetching player summary specific 1")
-		wg.Done()
-		return
-	}
-	req.Header = pc.getHeader()
-	res, err := pc.hc.Do(req)
-	if err != nil {
-		fmt.Println("error fetching player summary specific 2", err)
-		wg.Done()
-		return
-	}
+//func (pc *PlayerController) fetchPlayerSummarySpecific(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+//	fmt.Println(id, p)
+//	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/summary/%s?gameMode=all,ranked,unranked,casual&platform=%s&startDate=20210811&endDate=20211214", id, model.PlatformURLNames2[p])
+//	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+//	if err != nil {
+//		log.Println("error fetching player summary specific 1")
+//		wg.Done()
+//		return
+//	}
+//	req.Header = pc.getHeader()
+//	res, err := pc.hc.Do(req)
+//	if err != nil {
+//		fmt.Println("error fetching player summary specific 2", err)
+//		wg.Done()
+//		return
+//	}
+//
+//	fmt.Print("Specific:", res)
+//	wg.Done()
+//}
 
-	fmt.Print("Specific:", res)
-	wg.Done()
-}
-
-func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/seasonal/summary/%s?gameMode=all,ranked,casual,unranked&platform=%s", id, model.PlatformURLNames2[p])
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.Println("error fetching player summary 1")
-		wg.Done()
-		return
+		return err
 	}
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player summary 2")
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("error fetching player summary 3", res.Status)
-		wg.Done()
-		return
+		return errors.New("response status code is not 200")
 	}
 
 	var sm model.SummaryModel
 	de := json.NewDecoder(res.Body).Decode(&sm)
 	if de != nil {
-		log.Println("error fetching player level 5", de)
-		wg.Done()
-		return
+		return de
 	}
 
 	var sl model.SummaryPlatform
@@ -392,50 +336,41 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, wg *sync.Wai
 	case "xbl":
 		sl = sm.Platforms.Xbox
 	default:
-		log.Println("error fetching player level 5")
-		wg.Done()
-		return
+		return errors.New("error fetching player level 5")
 	}
 
 	player.Summary = &sl.SGameModes
-	wg.Done()
+	return nil
 }
 
-func (pc *PlayerController) fetchPlayerPlayTimeLevel(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
+func (pc *PlayerController) fetchPlayerPlayTimeLevel(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v1/profiles/stats?profileIds=%s&spaceId=%s&statNames=PPvPTimePlayed,PClearanceLevel", id, getSpaceId(p))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player level 1")
-		wg.Done()
-		return
+		return err
 	}
 
 	req.Header = pc.getHeader()
 	res, err := pc.hc.Do(req)
 	if err != nil {
-		log.Println("error fetching player level 3")
-		wg.Done()
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Println("error fetching player level 4")
-		wg.Done()
-		return
+		return errors.New("response status code is not 200")
 	}
 
 	var tm model.TimeAndLevelModel
 	de := json.NewDecoder(res.Body).Decode(&tm)
 	if de != nil {
-		log.Println("error fetching player level 5")
-		wg.Done()
-		return
+		return de
 	}
-	//log.Println(tm)
+
 	player.Level = &tm.Profiles[0].Stats.Level
 	player.TimePlayed = &tm.Profiles[0].Stats.TimePlayed
-	wg.Done()
+	return nil
 }
 
 func (pc *PlayerController) fetchPlayerProfile(ctx context.Context, n, p string) (*model.PlayerProfile, error) {
@@ -469,16 +404,9 @@ func (pc *PlayerController) fetchPlayerProfile(ctx context.Context, n, p string)
 
 func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*model.Player, error) {
 	res, err := pc.fetchPlayerProfile(ctx, n, p)
-	if err != nil {
+	if res == nil || err != nil {
 		return nil, err
 	}
-
-	if res == nil {
-		return nil, errors.New("player not found")
-	}
-	//TODO create channel for communication between goroutines
-	wg := &sync.WaitGroup{}
-
 	//set up aliases
 	a := &[]model.Alias{{
 		Name: res.NameOnPlatform,
@@ -493,30 +421,52 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 		Aliases:    a,
 		LastUpdate: time.Now().UTC(),
 	}
-	//if found, put in cache
-	wg.Add(7)
-	//return to request
-	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
-	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
-	//go pc.fetchPlayerSummarySpecific(ctx, wg, player, res.ProfileID, p)
-	go pc.fetchPlayerRanked(ctx, wg, player, res.ProfileID, p)
-	go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
-	go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
-	go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)
-	go pc.fetchPlayerTrends(ctx, wg, player, res.ProfileID, p)
-	wg.Wait()
 
-	select {
-	case <-ctx.Done():
-		return nil, errors.New("fetch new player context cancelled")
-	default:
-		//err := pc.mc.NewPlayer(ctx, p, player)
-		//if err != nil {
-		//	return nil, err
-		//}
-		log.Println("Fetch New Player Default select & inserted into mongodb")
-		return player, nil
+	g, ctx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		err := pc.fetchPlayerPlayTimeLevel(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	g.Go(func() error {
+		err := pc.fetchPlayerSummary(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	g.Go(func() error {
+		err := pc.fetchPlayerRanked(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	g.Go(func() error {
+		err := pc.fetchPlayerOperators(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	g.Go(func() error {
+		err := pc.fetchPlayerWeapons(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	g.Go(func() error {
+		err := pc.fetchPlayerMaps(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	g.Go(func() error {
+		err := pc.fetchPlayerTrends(ctx, player, res.ProfileID, p)
+		return err
+	})
+
+	if err := g.Wait(); err != nil {
+		fmt.Println("error found in one goroutine - exiting now")
+		return nil, err
 	}
+
+	fmt.Println("successfully fetched player")
+
+	return player, nil
 }
 
 func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
