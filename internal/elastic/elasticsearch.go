@@ -35,21 +35,21 @@ func NewElasticClient() (*ESClient, error) {
 	}
 
 	//DEV ONLY
-	for _, index := range []string{"r6index.uplay", "r6index.psn", "r6index.xbl"} {
-		if res, err = es.Indices.Delete([]string{index}); err != nil {
-			log.Fatalf("Cannot delete index: %s", err)
-		}
-		res.Body.Close()
-
-		res, err = es.Indices.Create(index)
-		if err != nil {
-			log.Fatalf("Cannot create index: %s", err)
-		}
-		if res.IsError() {
-			log.Fatalf("Cannot create index: %s", res)
-		}
-		res.Body.Close()
-	}
+	//for _, index := range []string{"r6index.uplay", "r6index.psn", "r6index.xbl"} {
+	//	if res, err = es.Indices.Delete([]string{index}); err != nil {
+	//		log.Fatalf("Cannot delete index: %s", err)
+	//	}
+	//	res.Body.Close()
+	//
+	//	res, err = es.Indices.Create(index)
+	//	if err != nil {
+	//		log.Fatalf("Cannot create index: %s", err)
+	//	}
+	//	if res.IsError() {
+	//		log.Fatalf("Cannot create index: %s", res)
+	//	}
+	//	res.Body.Close()
+	//}
 
 	res.Body.Close()
 	return &ESClient{

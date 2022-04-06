@@ -1,5 +1,10 @@
 package model
 
+type RankedOutput struct {
+	CurrentSeason *RankedSeason   `json:"currentSeason"`
+	RankedSeasons []*RankedSeason `json:"rankedSeasons"`
+}
+
 type RankedSeason struct {
 	Season             int     `json:"season"`
 	MaxMmr             float32 `json:"max_mmr"`

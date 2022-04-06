@@ -274,12 +274,16 @@ func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, player *model
 		return de
 	}
 
-	var seasons []model.RankedSeason
+	var seasons []*model.RankedSeason
 	for _, season := range m.SeasonsPlayerSkillRecords {
-		seasons = append(seasons, season.RegionsPlayerSkillRecords[0].BoardsPlayerSkillRecords[0].Seasons[0])
+		seasons = append(seasons, &(season.RegionsPlayerSkillRecords[0].BoardsPlayerSkillRecords[0].Seasons[0]))
 	}
 
-	player.Ranked = &seasons
+	player.Ranked = &model.RankedOutput{
+		CurrentSeason: seasons[len(seasons)-1],
+		RankedSeasons: seasons[:len(seasons)-1],
+	}
+
 	return nil
 }
 

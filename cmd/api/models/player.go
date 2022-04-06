@@ -24,7 +24,7 @@ type Player struct {
 	Aliases    *[]Alias           `json:"aliases"`
 	Level      *Level             `json:"level"`
 	Summary    *SummaryGameModes  `json:"summary,omitempty"`
-	Ranked     *[]RankedSeason    `json:"ranked,omitempty"`
+	Ranked     *RankedOutput      `json:"ranked,omitempty"`
 	Weapons    *WeaponsGameModes  `json:"weapons,omitempty"`
 	Operators  *OperatorGameModes `json:"operators,omitempty"`
 	Maps       *MapsGameModes     `json:"maps,omitempty"`
