@@ -48,7 +48,7 @@ type TrendsRoles struct {
 }
 
 type TrendsGameMode struct {
-	Type      string      `json:"type"`
+	//Type      string      `json:"type"`
 	TeamRoles TrendsRoles `json:"teamRoles"`
 }
 

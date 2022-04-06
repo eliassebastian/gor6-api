@@ -28,7 +28,7 @@ type MapsTeamRoles struct {
 	Defender []Map `json:"defender"`
 }
 type MapsGameMode struct {
-	Type      string        `json:"type"`
+	//Type      string        `json:"type"`
 	TeamRoles MapsTeamRoles `json:"teamRoles"`
 }
 type MapsGameModes struct {
