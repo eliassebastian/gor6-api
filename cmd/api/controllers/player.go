@@ -467,10 +467,10 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 }
 
 func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
+
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
-
-	startTime := time.Now()
 
 	var p testPayload
 	err := json.NewDecoder(r.Body).Decode(&p)
@@ -480,10 +480,15 @@ func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer r.Body.Close()
-
 	res, err := pc.fetchNewPlayer(ctx, p.Player, p.Platform)
 	if err != nil {
 		response.ErrorJSON(w, err)
+		return
+	}
+
+	ie := pc.ec.IndexPlayer(ctx, res, p.Platform)
+	if ie != nil {
+		response.ErrorJSON(w, ie)
 		return
 	}
 
