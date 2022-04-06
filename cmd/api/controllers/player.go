@@ -75,8 +75,8 @@ func genExpiration() string {
 	return time.Now().UTC().Add(10 * time.Minute).Format("2006-01-02T15:04:05.999Z07:00")
 }
 
-func getDate() string {
-	year, month, day := time.Now().AddDate(0, 0, -1).Date()
+func getDate(day int) string {
+	year, month, day := time.Now().AddDate(0, 0, day).Date()
 	s := fmt.Sprintf("%v%02d%02d", year, int(month), day)
 	fmt.Println("Date:", s)
 	return s
@@ -93,7 +93,7 @@ func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (b
 }
 
 func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=20211206&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=%s&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate(-8), getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player trends 1")
@@ -143,7 +143,7 @@ func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, wg *sync.Wait
 }
 
 func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/maps/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=all,attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player map 1")
@@ -192,7 +192,7 @@ func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, wg *sync.WaitGr
 }
 
 func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all&platform=%s&teamRole=all&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/weapons/%s?gameMode=all&platform=%s&teamRole=all&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player weapon specific 1")
@@ -242,7 +242,7 @@ func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, wg *sync.Wai
 }
 
 func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, wg *sync.WaitGroup, player *model.Player, id, p string) {
-	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate())
+	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/operators/%s?gameMode=all,ranked,casual,unranked&platform=%s&teamRole=attacker,defender&startDate=20160101&endDate=%s", id, model.PlatformURLNames2[p], getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		log.Println("error fetching player operator 1", err)
@@ -494,7 +494,7 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 		LastUpdate: time.Now().UTC(),
 	}
 	//if found, put in cache
-	wg.Add(6)
+	wg.Add(7)
 	//return to request
 	go pc.fetchPlayerPlayTimeLevel(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerSummary(ctx, wg, player, res.ProfileID, p)
@@ -503,6 +503,7 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 	go pc.fetchPlayerOperators(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerWeapons(ctx, wg, player, res.ProfileID, p)
 	go pc.fetchPlayerMaps(ctx, wg, player, res.ProfileID, p)
+	go pc.fetchPlayerTrends(ctx, wg, player, res.ProfileID, p)
 	wg.Wait()
 
 	select {
