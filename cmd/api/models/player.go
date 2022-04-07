@@ -3,10 +3,10 @@ package model
 import "time"
 
 type PlayerProfile struct {
-	ProfileID string `json:"profileId"`
-	//UserID         string `json:"userId"`
-	PlatformType   string `json:"platformType"`
-	IDOnPlatform   string `json:"idOnPlatform"`
+	ProfileID    string `json:"profileId"`
+	UserID       string `json:"userId"`
+	PlatformType string `json:"platformType"`
+	//IDOnPlatform   string `json:"idOnPlatform"`
 	NameOnPlatform string `json:"nameOnPlatform"`
 }
 
@@ -15,8 +15,8 @@ type PlayerProfiles struct {
 }
 
 type Player struct {
-	ID         string             `json:"profileID" bson:"_id"`
-	PlatformID string             `json:"platformID"`
+	ProfileId  string             `json:"profileId"`
+	UserId     string             `json:"userId"`
 	Platform   string             `json:"platform"`
 	NickName   string             `json:"nickName"`
 	LastUpdate time.Time          `json:"lastUpdate"`

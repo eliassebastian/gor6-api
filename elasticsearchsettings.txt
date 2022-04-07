@@ -1,0 +1,262 @@
+curl -X POST "localhost:9200/r6index.uplay/_close"
+
+curl -X PUT "localhost:9200/r6index.uplay/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "search": {
+          "tokenizer": "search",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      },
+      "tokenizer": {
+        "search": {
+          "type": "edge_ngram",
+          "min_gram": 3,
+          "max_gram": 20
+        }
+      }
+    }
+  }
+}
+'
+
+curl -X POST "localhost:9200/r6index.uplay/_open"
+
+curl -X PUT "localhost:9200/r6index.uplay/_mapping?pretty" -H 'Content-Type: application/json' -d'
+{
+  "properties": {
+    "profileId": {
+      "type": "keyword"
+    },
+    "userId": {
+      "type": "keyword"
+    },
+    "platform": {
+      "type": "keyword",
+      "index": "false"
+    },
+    "nickName": {
+      "type": "keyword"
+    },
+    "lastUpdate": {
+      "type": "date",
+      "index": "false"
+    },
+    "timePlayed": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "long",
+          "index": "false"
+        },
+        "lastModified": {
+          "type": "date",
+          "index": "false"
+        }
+      }
+    },
+    "aliases": {
+      "properties": {
+        "name": {
+          "type": "text",
+          "analyzer": "search"
+        },
+        "date": {
+          "type": "date"
+        }
+      }
+    },
+    "level": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "long",
+          "index": "false"
+        },
+        "lastModified": {
+          "type": "date",
+          "index": "false"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "enabled": "false"
+    },
+    "ranked": {
+      "type": "object",
+      "properties": {
+        "currentSeason": {
+          "type": "object",
+          "properties": {
+            "season": {
+              "type": "long",
+              "index": "false"
+            },
+            "max_mmr": {
+              "type": "float",
+              "index": "false"
+            },
+            "skill_mean": {
+              "type": "float",
+              "index": "false"
+            },
+            "deaths": {
+              "type": "long",
+              "index": "false"
+            },
+            "rank": {
+              "type": "long",
+              "index": "false"
+            },
+            "max_rank": {
+              "type": "long",
+              "index": "false"
+            },
+            "skill_stdev": {
+              "type": "float",
+              "index": "false"
+            },
+            "kills": {
+              "type": "long",
+              "index": "false"
+            },
+            "last_match_mmr_change": {
+              "type": "float",
+              "index": "false"
+            },
+            "abandons": {
+              "type": "long",
+              "index": "false"
+            },
+            "mmr": {
+              "type": "float",
+              "index": "false"
+            },
+            "last_match_result": {
+              "type": "long",
+              "index": "false"
+            },
+            "wins": {
+              "type": "long",
+              "index": "false"
+            },
+            "losses": {
+              "type": "long",
+              "index": "false"
+            }
+          }
+        },
+        "rankedSeasons": {
+          "type": "object",
+          "properties": {
+            "season": {
+              "type": "long",
+              "index": "false"
+            },
+            "max_mmr": {
+              "type": "float",
+              "index": "false"
+            },
+            "skill_mean": {
+              "type": "float",
+              "index": "false"
+            },
+            "deaths": {
+              "type": "long",
+              "index": "false"
+            },
+            "rank": {
+              "type": "long",
+              "index": "false"
+            },
+            "max_rank": {
+              "type": "long",
+              "index": "false"
+            },
+            "skill_stdev": {
+              "type": "float",
+              "index": "false"
+            },
+            "kills": {
+              "type": "long",
+              "index": "false"
+            },
+            "last_match_mmr_change": {
+              "type": "float",
+              "index": "false"
+            },
+            "abandons": {
+              "type": "long",
+              "index": "false"
+            },
+            "mmr": {
+              "type": "float",
+              "index": "false"
+            },
+            "last_match_result": {
+              "type": "long",
+              "index": "false"
+            },
+            "wins": {
+              "type": "long",
+              "index": "false"
+            },
+            "losses": {
+              "type": "long",
+              "index": "false"
+            }
+          }
+        }
+      }
+    },
+    "weapons": {
+      "type": "object",
+      "enabled": "false"
+    },
+    "operators": {
+      "type": "object",
+      "enabled": "false"
+    },
+    "maps": {
+      "type": "object",
+      "enabled": "false"
+    },
+    "trends": {
+      "type": "object",
+      "enabled": "false"
+    }
+  }
+}
+'
+
+curl -X DELETE "localhost:9200/r6index.uplay/_doc/81bde55f-a30f-450a-94cb-4151b1a32130?pretty"
+
+curl -H "Content-Type: application/json" -X POST -d '{"player":"Kanzen","platform":"uplay"}' https://localhost:8090/test
+
+curl -X POST "localhost:9200/r6index.uplay/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "match": {"aliases.name": "kanzen"}
+  },
+  "fields": [
+    "profileId",
+    "platform",
+    "nickName",
+    "aliases.name",
+    "level.value",
+    "timePlayed.value",
+    "timePlayed.lastModified",
+    "ranked.currentSeason.rank"
+  ],
+  "_source": false,
+  "size": 10
+}
+'
+
+
+

@@ -418,8 +418,8 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 	}}
 
 	player := &model.Player{
-		ID:         res.ProfileID,
-		PlatformID: res.IDOnPlatform,
+		ProfileId:  res.ProfileID,
+		UserId:     res.UserID,
 		Platform:   res.PlatformType,
 		NickName:   res.NameOnPlatform,
 		Aliases:    a,
