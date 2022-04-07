@@ -19,6 +19,7 @@ type SearchFields struct {
 	AliasesName             []string    `json:"aliases.name"`
 	TimePlayedLastModified  []time.Time `json:"timePlayed.lastModified"`
 	ProfileID               []string    `json:"profileID"`
+	Platform                []string    `json:"platform"`
 	NickName                []string    `json:"nickName"`
 	TimePlayedValue         []int       `json:"timePlayed.value"`
 	RankedCurrentSeasonRank []int       `json:"ranked.currentSeason.rank"`
