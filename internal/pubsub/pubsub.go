@@ -51,7 +51,6 @@ func (c *Consumer) Run(ctx context.Context) {
 				continue
 			}
 			//TODO: send to ubisoft connection repo
-			log.Println(m.Topic, m.Partition, m.Offset)
 			we := c.write(m.Value)
 			if we != nil {
 				log.Println("Error Writing to Sync Map")
@@ -65,7 +64,6 @@ func (c *Consumer) Run(ctx context.Context) {
 
 func (c *Consumer) write(b []byte) error {
 	var session map[string]string
-	log.Println(b)
 	//var session models.Session
 	err := json.NewDecoder(bytes.NewReader(b)).Decode(&session)
 	if err != nil {
