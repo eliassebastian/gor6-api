@@ -16,7 +16,7 @@ type ESClient struct {
 	Client *elasticsearch.Client
 }
 
-func NewElasticClient() (*ESClient, error) {
+func NewElasticClient(ctx context.Context) (*ESClient, error) {
 	//TODO: Secure ElasticSearch Client
 	cfg := elasticsearch.Config{
 		Addresses: []string{
@@ -34,22 +34,11 @@ func NewElasticClient() (*ESClient, error) {
 		return nil, errors.New("error pinging new elasticsearch client")
 	}
 
-	//DEV ONLY
-	//for _, index := range []string{"r6index.uplay", "r6index.psn", "r6index.xbl"} {
-	//	if res, err = es.Indices.Delete([]string{index}); err != nil {
-	//		log.Fatalf("Cannot delete index: %s", err)
-	//	}
-	//	res.Body.Close()
-	//
-	//	res, err = es.Indices.Create(index)
-	//	if err != nil {
-	//		log.Fatalf("Cannot create index: %s", err)
-	//	}
-	//	if res.IsError() {
-	//		log.Fatalf("Cannot create index: %s", res)
-	//	}
-	//	res.Body.Close()
-	//}
+	//First Time Migration
+	err = InitialSetup(ctx, es)
+	if err != nil {
+		return nil, errors.New("error running elasticsearch migration")
+	}
 
 	res.Body.Close()
 	return &ESClient{
@@ -81,10 +70,7 @@ func (c *ESClient) IndexPlayer(ctx context.Context, player *model.Player, platfo
 	return nil
 }
 
-func (c *ESClient) SearchPlayer(ctx context.Context, name, platform string) (*model.SearchHits, error) {
-
-	fmt.Println(name, platform)
-
+func (c *ESClient) SearchPlayer(ctx context.Context, name, platform string) (float32, *model.SearchHits, error) {
 	var buf bytes.Buffer
 	query := model.SearchInput{
 		Query: model.SearchQuery{
@@ -96,7 +82,7 @@ func (c *ESClient) SearchPlayer(ctx context.Context, name, platform string) (*mo
 
 	//s := fmt.Sprintf(`{"query": {"match": {"aliases.name": %s} }, fields": ["profileId", "platform", "nickName", "aliases.name", "level.value", "timePlayed.value", "timePlayed.lastModified", "ranked.currentSeason.rank"], "_source": false}`, name)
 	if err := json.NewEncoder(&buf).Encode(query); err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	res, err := c.Client.Search(
@@ -110,19 +96,19 @@ func (c *ESClient) SearchPlayer(ctx context.Context, name, platform string) (*mo
 	)
 
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	defer res.Body.Close()
 	if res.IsError() {
 		log.Println(res)
-		return nil, errors.New(fmt.Sprintf("[%s] error searching index %s for player=%s", res.Status(), platform, name))
+		return 0, nil, errors.New(fmt.Sprintf("[%s] error searching index %s for player=%s", res.Status(), platform, name))
 	}
 
 	var output model.SearchOutput
 	if err := json.NewDecoder(res.Body).Decode(&output); err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
-	return &output.Hits, nil
+	return output.Hits.MaxScore, &output.Hits, nil
 }

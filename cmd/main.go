@@ -48,7 +48,7 @@ func run() (<-chan error, error) {
 		return nil, err
 	}
 	//create elasticsearch connection
-	es, err := elastic.NewElasticClient()
+	es, err := elastic.NewElasticClient(context.Background())
 	if err != nil {
 		return nil, err
 	}
