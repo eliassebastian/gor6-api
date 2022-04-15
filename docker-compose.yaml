@@ -13,26 +13,30 @@ services:
       - "9200:9200"
       - "9300:9300"
   redis01:
-    image: bitnami/redis:latest
+#    image: bitnami/redis:latest
+    image: arm64v8/redis
     container_name: redis_01
     environment:
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG
+      - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "6379:6379"
   redis02:
-    image: bitnami/redis:latest
+#    image: bitnami/redis:latest
+    image: arm64v8/redis
     container_name: redis_02
     environment:
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG
       - REDIS_PORT_NUMBER=6400
+      - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "6400:6400"
-  rabbitmq:
-    image: bitnami/rabbitmq:latest
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+#  rabbitmq:
+#    image: bitnami/rabbitmq:latest
+#    container_name: rabbitmq
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
 
 volumes:
   elasticsearch-data:
