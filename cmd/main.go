@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
-	"github.com/eliassebastian/gor6-api/internal/mongodb"
 	"github.com/eliassebastian/gor6-api/internal/pubsub"
+	"github.com/eliassebastian/gor6-api/internal/rabbitmq"
 	"log"
 	"net/http"
 	"os"
@@ -31,22 +31,6 @@ func run() (<-chan error, error) {
 		log.Printf(":: %v", cert)
 		return nil, err
 	}
-
-	/*
-		caCert, err := ioutil.ReadFile("./cert/ExampleCA.pem")
-		if err != nil {
-			log.Printf("error %v", caCert)
-			return nil, err
-		}
-
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(caCert)
-	*/
-	//create mongodb connection
-	mc, err := mongodb.NewMongoClient()
-	if err != nil {
-		return nil, err
-	}
 	//create elasticsearch connection
 	es, err := elastic.NewElasticClient(context.Background())
 	if err != nil {
@@ -56,7 +40,6 @@ func run() (<-chan error, error) {
 	kc := pubsub.NewReader()
 
 	srv, err := newServer(serverConfig{
-		MongoDB:       mc,
 		ElasticSearch: es,
 		Kafka:         kc,
 		TLS: &tls.Config{
@@ -80,7 +63,6 @@ func run() (<-chan error, error) {
 
 		defer func() {
 			kc.Close()
-			mc.Close()
 
 			stop()
 			cancel()
@@ -99,8 +81,6 @@ func run() (<-chan error, error) {
 	go kc.Run(ctx)
 
 	go func() {
-		//http2Server := http2.Server{}
-		//_ = http2.ConfigureServer(srv, &http2Server)
 		log.Println("Server Listen And Serve")
 		if err := srv.ListenAndServeTLS("./cert/localhost.pem", "./cert/localhost-key.pem"); err != nil {
 			errC <- err
@@ -112,9 +92,9 @@ func run() (<-chan error, error) {
 
 type serverConfig struct {
 	//Address       string
-	MongoDB       *mongodb.MongoClient
 	ElasticSearch *elastic.ESClient
 	Kafka         *pubsub.Consumer
+	Rabbit        *rabbitmq.RabbitConsumer
 	TLS           *tls.Config
 }
 
