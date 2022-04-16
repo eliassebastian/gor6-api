@@ -40,29 +40,21 @@ func run() (<-chan error, error) {
 		return nil, err
 	}
 
-	log.Println("finished setting up es")
-
 	//initialise redis instances
 	ic, err := cache.InitIndexCache(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("finished setting up index cache")
-
 	pc, err := cache.InitProfileCache(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("finished setting up profile cache")
-
 	r, err := rabbitmq.NewConsumer()
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println("finished setting clients")
 
 	srv, err := newServer(serverConfig{
 		ElasticSearch: es,
