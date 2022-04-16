@@ -35,10 +35,10 @@ func NewElasticClient(ctx context.Context) (*ESClient, error) {
 	}
 
 	//First Time Migration
-	err = InitialSetup(ctx, es)
-	if err != nil {
-		return nil, errors.New("error running elasticsearch migration")
-	}
+	//err = InitialSetup(ctx, es)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	res.Body.Close()
 	return &ESClient{

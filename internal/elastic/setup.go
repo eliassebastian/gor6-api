@@ -249,9 +249,9 @@ func InitialSetup(ctx context.Context, es *elasticsearch.Client) error {
 		return err
 	}
 
-	if res.IsError() {
-		return errors.New("error running initial check on existing indices")
-	}
+	//if res.IsError() {
+	//	return errors.New(res.Status())
+	//}
 
 	//indices exist so don't run migration
 	if res.StatusCode == 200 {

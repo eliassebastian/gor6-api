@@ -39,6 +39,7 @@ func run() (<-chan error, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	//initialise redis instances
 	ic, err := cache.InitIndexCache(ctx)
 	if err != nil {
