@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"github.com/eliassebastian/gor6-api/internal/cache"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
-	"github.com/eliassebastian/gor6-api/internal/pubsub"
 	"github.com/eliassebastian/gor6-api/internal/rabbitmq"
 	"log"
 	"net/http"
@@ -31,17 +31,35 @@ func run() (<-chan error, error) {
 		log.Printf(":: %v", cert)
 		return nil, err
 	}
+
+	ctx := context.Background()
+
 	//create elasticsearch connection
-	es, err := elastic.NewElasticClient(context.Background())
+	es, err := elastic.NewElasticClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	//create kafka consumer
-	kc := pubsub.NewReader()
+	//initialise redis instances
+	ic, err := cache.InitIndexCache(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	pc, err := cache.InitProfileCache(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := rabbitmq.NewConsumer()
+	if err != nil {
+		return nil, err
+	}
 
 	srv, err := newServer(serverConfig{
 		ElasticSearch: es,
-		Kafka:         kc,
+		IndexCache:    ic,
+		ProfileCache:  pc,
+		Rabbit:        r,
 		TLS: &tls.Config{
 			Certificates: []tls.Certificate{cert},
 			//RootCAs:      caCertPool,
@@ -50,7 +68,7 @@ func run() (<-chan error, error) {
 
 	errC := make(chan error, 1)
 
-	ctx, stop := signal.NotifyContext(context.Background(),
+	ctx, stop := signal.NotifyContext(ctx,
 		os.Interrupt,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
@@ -62,7 +80,9 @@ func run() (<-chan error, error) {
 		ctxTimeout, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 		defer func() {
-			kc.Close()
+			r.Close()
+			ic.Close()
+			pc.Close()
 
 			stop()
 			cancel()
@@ -78,7 +98,7 @@ func run() (<-chan error, error) {
 		log.Println("Shutdown Complete")
 	}()
 
-	go kc.Run(ctx)
+	go r.Consumer(ctx)
 
 	go func() {
 		log.Println("Server Listen And Serve")
@@ -93,9 +113,11 @@ func run() (<-chan error, error) {
 type serverConfig struct {
 	//Address       string
 	ElasticSearch *elastic.ESClient
-	Kafka         *pubsub.Consumer
-	Rabbit        *rabbitmq.RabbitConsumer
-	TLS           *tls.Config
+	//Kafka         *pubsub.Consumer
+	Rabbit       *rabbitmq.RabbitConsumer
+	IndexCache   *cache.IndexCache
+	ProfileCache *cache.ProfileCache
+	TLS          *tls.Config
 }
 
 func getTLSConfig() *tls.Config {

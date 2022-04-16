@@ -58,7 +58,7 @@ func (c *RabbitConsumer) Close() error {
 		log.Println("error closing rabbit connection")
 	}
 
-	return nil
+	return err
 }
 
 func (c *RabbitConsumer) write(b []byte) error {
@@ -93,7 +93,7 @@ func (c *RabbitConsumer) Consumer(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Exiting Loop")
+			log.Println("Exiting RabbitMQ Loop")
 			return
 		case msg := <-msgs:
 			err := c.write(msg.Body)
