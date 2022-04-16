@@ -3,10 +3,12 @@ package controllers
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
+	"errors"
 	"fmt"
+	model "github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/cmd/api/response"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
+	"github.com/vmihailenco/msgpack/v5"
 	"log"
 	"net/http"
 	"sync"
@@ -54,6 +56,35 @@ func (sc *SearchController) getHeader() http.Header {
 	}
 }
 
+func (sc *SearchController) fetchPlayerProfile(ctx context.Context, n, p string) (*model.PlayerProfile, error) {
+	url := fmt.Sprintf("https://public-ubiservices.ubi.com/v3/profiles?namesOnPlatform=%s&platformType=%s", n, p)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header = sc.getHeader()
+	res, err := sc.hc.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return nil, errors.New(fmt.Sprintf("error fetching profileId STATUS CODE %v // S: %s", res.StatusCode, res.Status))
+	}
+
+	var player model.PlayerProfiles
+	de := msgpack.NewDecoder(res.Body).Decode(&player)
+	if de != nil {
+		return nil, errors.New("error decoding player")
+	}
+	if len(player.Profiles) == 0 {
+		return nil, nil
+	}
+	return &player.Profiles[0], nil
+}
+
 type searchPayload struct {
 	Player   string
 	Platform string
@@ -62,20 +93,18 @@ type searchPayload struct {
 //curl -H "Content-Type: application/json" -X POST -d '{"player":"Kanzen","platform":"uplay"}' https://localhost:8090/test
 func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
-	log.Println("Search Player Running???")
 
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
 	var sp searchPayload
-	err := json.NewDecoder(r.Body).Decode(&sp)
+	err := msgpack.NewDecoder(r.Body).Decode(&sp)
 	if err != nil {
 		response.ErrorJSON(w, err)
 		return
 	}
 
 	defer r.Body.Close()
-	fmt.Println(sp.Player, sp.Platform)
 
 	n, res, err := sc.ec.SearchPlayer(ctx, sp.Player, sp.Platform)
 	if err != nil {
@@ -83,7 +112,56 @@ func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	//experiment with maxscore to define boundary for fetching profile from ubisoft
 	log.Println("Search Controller Search Player Func - MaxScore:", n, "for Player:", sp.Player)
+	if n < 0.55 || res.Total.Value == 0 {
+		p, err := sc.fetchPlayerProfile(ctx, sp.Player, sp.Platform)
+		if err != nil {
+			response.ErrorJSON(w, err)
+			return
+		}
+		//if profile is found add to existing slice
+		if p != nil {
+			//iterate through existing results to check if profile is already included
+			for _, result := range res.Hits {
+				if result.Fields.ProfileID[0] == p.ProfileID {
+					response.SuccessJSON(w, startTime, res.Hits)
+					return
+				}
+			}
 
-	response.SuccessJSON(w, startTime, res)
+			sf := []model.SearchResults{
+				{
+					Index: sp.Platform,
+					ID:    p.ProfileID,
+					Score: -1,
+					Fields: model.SearchFields{
+						ProfileID: []string{p.ProfileID},
+						NickName:  []string{p.NameOnPlatform},
+						Platform:  []string{p.PlatformType},
+					},
+				},
+			}
+
+			tot := res.Total.Value + 1
+			if tot <= cap(res.Hits) {
+				s2 := res.Hits[:tot]
+				copy(s2[1:], res.Hits[0:])
+				copy(s2[0:], sf)
+
+				response.SuccessJSON(w, startTime, &s2)
+				return
+			}
+
+			s2 := make([]model.SearchResults, tot)
+			copy(s2, res.Hits[:0])
+			copy(s2[0:], sf)
+			copy(s2[1:], res.Hits[0:])
+
+			response.SuccessJSON(w, startTime, &s2)
+			return
+		}
+	}
+
+	response.SuccessJSON(w, startTime, &res.Hits)
 }
