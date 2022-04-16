@@ -11,7 +11,7 @@ type IndexCache struct {
 
 func InitIndexCache(ctx context.Context) (*IndexCache, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // use default Addr
+		Addr:     "localhost:6400", // use default Addr
 		Password: "",               // no password set
 		DB:       0,                // use default DB
 	})
