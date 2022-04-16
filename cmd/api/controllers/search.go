@@ -77,11 +77,13 @@ func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request)
 	defer r.Body.Close()
 	fmt.Println(sp.Player, sp.Platform)
 
-	res, err := sc.ec.SearchPlayer(ctx, sp.Player, sp.Platform)
+	n, res, err := sc.ec.SearchPlayer(ctx, sp.Player, sp.Platform)
 	if err != nil {
 		response.ErrorJSON(w, err)
 		return
 	}
+
+	log.Println("Search Controller Search Player Func - MaxScore:", n, "for Player:", sp.Player)
 
 	response.SuccessJSON(w, startTime, res)
 }
