@@ -130,6 +130,8 @@ func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request)
 				}
 			}
 
+			//TODO: cache profileID for index
+
 			sf := []model.SearchResults{
 				{
 					Index: sp.Platform,
