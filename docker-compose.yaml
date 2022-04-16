@@ -21,16 +21,21 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "6379:6379"
+    volumes:
+      - ./redis_01/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
   redis02:
 #    image: bitnami/redis:latest
     image: arm64v8/redis
     container_name: redis_02
     environment:
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG
-      - REDIS_PORT_NUMBER=6400
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "6400:6400"
+    volumes:
+      - ./redis_02/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
 #  rabbitmq:
 #    image: bitnami/rabbitmq:latest
 #    container_name: rabbitmq

@@ -101,7 +101,6 @@ func (c *RabbitConsumer) Consumer(ctx context.Context) {
 				log.Println("could not write to session cache")
 			}
 		default:
-			log.Println("no activity")
 		}
 	}
 }
