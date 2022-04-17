@@ -9,7 +9,6 @@ import (
 	"github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/cmd/api/response"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
-	"github.com/vmihailenco/msgpack/v5"
 	"golang.org/x/sync/errgroup"
 	"log"
 	"net/http"
@@ -397,7 +396,7 @@ func (pc *PlayerController) fetchPlayerProfile(ctx context.Context, n, p string)
 	}
 
 	var player model.PlayerProfiles
-	de := msgpack.NewDecoder(res.Body).Decode(&player)
+	de := json.NewDecoder(res.Body).Decode(&player)
 	if de != nil {
 		return nil, errors.New("error decoding player")
 	}
@@ -478,7 +477,7 @@ func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	var p testPayload
-	err := msgpack.NewDecoder(r.Body).Decode(&p)
+	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
 		response.ErrorJSON(w, err)
 		return

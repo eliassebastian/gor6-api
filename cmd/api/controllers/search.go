@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	model "github.com/eliassebastian/gor6-api/cmd/api/models"
@@ -78,7 +79,7 @@ func (sc *SearchController) fetchPlayerProfile(ctx context.Context, n, p string)
 	}
 
 	var player model.PlayerProfiles
-	de := msgpack.NewDecoder(res.Body).Decode(&player)
+	de := json.NewDecoder(res.Body).Decode(&player)
 	if de != nil {
 		return nil, errors.New("error decoding player")
 	}
@@ -101,8 +102,9 @@ func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request)
 	defer cancel()
 
 	var sp searchPayload
-	err := msgpack.NewDecoder(r.Body).Decode(&sp)
+	err := json.NewDecoder(r.Body).Decode(&sp)
 	if err != nil {
+		log.Println("msgpack error #1")
 		response.ErrorJSON(w, err)
 		return
 	}
@@ -117,7 +119,7 @@ func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request)
 
 	//experiment with maxscore to define boundary for fetching profile from ubisoft
 	log.Println("Search Controller Search Player Func - MaxScore:", n, "for Player:", sp.Player)
-	if n < 0.55 || res.Total.Value == 0 {
+	if n < 1.0 || res.Total.Value == 0 {
 		p, err := sc.fetchPlayerProfile(ctx, sp.Player, sp.Platform)
 		if err != nil {
 			response.ErrorJSON(w, err)
@@ -134,6 +136,18 @@ func (sc *SearchController) SearchPlayer(w http.ResponseWriter, r *http.Request)
 			}
 
 			//TODO: cache profileID for index
+			b, err := msgpack.Marshal(p)
+			if err != nil {
+				log.Println("msgpack error #2")
+				response.ErrorJSON(w, err)
+				return
+			}
+
+			err = sc.ic.DB.Set(ctx, p.ProfileID, b, 30*time.Minute).Err()
+			if err != nil {
+				response.ErrorJSON(w, err)
+				return
+			}
 
 			sf := []model.SearchResults{
 				{
