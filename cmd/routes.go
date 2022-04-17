@@ -10,7 +10,7 @@ func routes(c serverConfig) http.Handler {
 	mux := chi.NewRouter()
 	//initialise controllers
 	pc := controllers.NewPlayerController(c.ElasticSearch, c.TLS, c.Rabbit.Cache)
-	sc := controllers.NewSearchController(c.ElasticSearch, c.TLS, c.Rabbit.Cache)
+	sc := controllers.NewSearchController(c.ElasticSearch, c.IndexCache, c.TLS, c.Rabbit.Cache)
 	//middleware
 
 	//curl -H "Content-Type: application/json" -X POST -d '{"player":"Kanzen","platform":"uplay"}' https://localhost:8090/test

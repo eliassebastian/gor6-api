@@ -7,6 +7,7 @@ import (
 	"fmt"
 	model "github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/cmd/api/response"
+	"github.com/eliassebastian/gor6-api/internal/cache"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
 	"github.com/vmihailenco/msgpack/v5"
 	"log"
@@ -17,13 +18,15 @@ import (
 
 type SearchController struct {
 	ec *elastic.ESClient
+	ic *cache.IndexCache
 	sm *sync.Map
 	hc *http.Client
 }
 
-func NewSearchController(c *elastic.ESClient, tlsc *tls.Config, p *sync.Map) *SearchController {
+func NewSearchController(c *elastic.ESClient, i *cache.IndexCache, tlsc *tls.Config, p *sync.Map) *SearchController {
 	return &SearchController{
 		ec: c,
+		ic: i,
 		//mc: m,
 		sm: p,
 		hc: &http.Client{
