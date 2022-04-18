@@ -112,3 +112,27 @@ func (c *ESClient) SearchPlayer(ctx context.Context, name, platform string) (flo
 
 	return output.Hits.MaxScore, &output.Hits, nil
 }
+
+func (c *ESClient) FetchPlayer(ctx context.Context, id, platform string) (*model.Player, error) {
+	//curl -X GET "localhost:9200/r6index.uplay/_doc/81bde55f-a30f-450a-94cb-4151b1a32130?pretty"
+	res, err := c.Client.Get("r6index."+platform, id, c.Client.Get.WithContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	if res.IsError() {
+		return nil, errors.New("esapi response error")
+	}
+
+	var output model.GetResult
+	if err := json.NewDecoder(res.Body).Decode(&output); err != nil {
+		return nil, err
+	}
+
+	if !output.Found {
+		return nil, errors.New("player not found")
+	}
+
+	return &output.Source, nil
+}

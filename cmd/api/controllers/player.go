@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"github.com/eliassebastian/gor6-api/cmd/api/models"
 	"github.com/eliassebastian/gor6-api/cmd/api/response"
+	"github.com/eliassebastian/gor6-api/internal/cache"
 	"github.com/eliassebastian/gor6-api/internal/elastic"
+	"github.com/vmihailenco/msgpack/v5"
 	"golang.org/x/sync/errgroup"
 	"log"
 	"net/http"
@@ -19,6 +21,8 @@ import (
 type PlayerController struct {
 	ec *elastic.ESClient
 	//mc *mongodb.MongoClient
+	ic *cache.IndexCache
+	pc *cache.ProfileCache
 	sm *sync.Map
 	hc *http.Client
 }
@@ -28,9 +32,11 @@ type testPayload struct {
 	Platform string
 }
 
-func NewPlayerController(c *elastic.ESClient, tlsc *tls.Config, p *sync.Map) *PlayerController {
+func NewPlayerController(c *elastic.ESClient, ic *cache.IndexCache, pc *cache.ProfileCache, tlsc *tls.Config, p *sync.Map) *PlayerController {
 	return &PlayerController{
 		ec: c,
+		ic: ic,
+		pc: pc,
 		//mc: m,
 		sm: p,
 		hc: &http.Client{
@@ -83,16 +89,6 @@ func getDate(day int) string {
 	return s
 }
 
-func (pc *PlayerController) searchForPlayer(ctx context.Context, n, p string) (bool, interface{}, error) {
-	//TODO: Redis Cache Player?
-
-	//TODO: search elastic search
-
-	//Not Indexed? Fetch
-
-	return false, nil, nil
-}
-
 func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, player *model.Player, id, p string) error {
 	url := fmt.Sprintf("https://r6s-stats.ubisoft.com/v1/current/trend/%s?gameMode=all,ranked,casual,unranked&startDate=%s&endDate=%s&teamRole=all,attacker,defender&trendType=days", id, getDate(-7), getDate(-1))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -107,6 +103,11 @@ func (pc *PlayerController) fetchPlayerTrends(ctx context.Context, player *model
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == 204 {
+		player.Trends = &model.TrendGameModes{}
+		return nil
+	}
+
 	if res.StatusCode != 200 {
 		return errors.New("(trends) response status code is not 200")
 	}
@@ -146,6 +147,11 @@ func (pc *PlayerController) fetchPlayerMaps(ctx context.Context, player *model.P
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == 204 {
+		player.Maps = &model.MapsGameModes{}
+		return nil
+	}
+
 	if res.StatusCode != 200 {
 		return errors.New("(map) response status code is not 200")
 	}
@@ -185,6 +191,11 @@ func (pc *PlayerController) fetchPlayerWeapons(ctx context.Context, player *mode
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == 204 {
+		player.Weapons = &model.WeaponsGameModes{}
+		return nil
+	}
+
 	if res.StatusCode != 200 {
 		return errors.New("response status code is not 200")
 	}
@@ -224,6 +235,11 @@ func (pc *PlayerController) fetchPlayerOperators(ctx context.Context, player *mo
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == 204 {
+		player.Operators = &model.OperatorGameModes{}
+		return nil
+	}
+
 	if res.StatusCode != 200 {
 		return errors.New("response status code is not 200")
 	}
@@ -264,6 +280,11 @@ func (pc *PlayerController) fetchPlayerRanked(ctx context.Context, player *model
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == 204 {
+		player.Ranked = &model.RankedOutput{}
+		return nil
+	}
+
 	if res.StatusCode != 200 {
 		return errors.New("response status code is not 200")
 	}
@@ -321,6 +342,12 @@ func (pc *PlayerController) fetchPlayerSummary(ctx context.Context, player *mode
 	}
 
 	defer res.Body.Close()
+	//have to mitigate ubisoft returning no content
+	if res.StatusCode == 204 {
+		player.Summary = &model.SummaryGameModes{}
+		return nil
+	}
+
 	if res.StatusCode != 200 {
 		return errors.New("response status code is not 200")
 	}
@@ -406,60 +433,66 @@ func (pc *PlayerController) fetchPlayerProfile(ctx context.Context, n, p string)
 	return &player.Profiles[0], nil
 }
 
-func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*model.Player, error) {
-	res, err := pc.fetchPlayerProfile(ctx, n, p)
-	if res == nil || err != nil {
-		return nil, err
+func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string, prof *model.PlayerProfile) (*model.Player, error) {
+	var err error
+	if prof == nil {
+		prof, err = pc.fetchPlayerProfile(ctx, n, p)
+		if prof == nil || err != nil {
+			return nil, err
+		}
 	}
+
 	//set up aliases
 	a := &[]model.Alias{{
-		Name: res.NameOnPlatform,
+		Name: prof.NameOnPlatform,
 		Date: time.Now().UTC(),
 	}}
 
 	player := &model.Player{
-		ProfileId:  res.ProfileID,
-		UserId:     res.UserID,
-		Platform:   res.PlatformType,
-		NickName:   res.NameOnPlatform,
+		ProfileId:  prof.ProfileID,
+		UserId:     prof.UserID,
+		Platform:   prof.PlatformType,
+		NickName:   prof.NameOnPlatform,
 		Aliases:    a,
 		LastUpdate: time.Now().UTC(),
 	}
 
 	g, ctx := errgroup.WithContext(ctx)
 
+	log.Println(player)
+
 	g.Go(func() error {
-		err := pc.fetchPlayerPlayTimeLevel(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerPlayTimeLevel(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
 	g.Go(func() error {
-		err := pc.fetchPlayerSummary(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerSummary(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
 	g.Go(func() error {
-		err := pc.fetchPlayerRanked(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerRanked(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
 	g.Go(func() error {
-		err := pc.fetchPlayerOperators(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerOperators(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
 	g.Go(func() error {
-		err := pc.fetchPlayerWeapons(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerWeapons(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
 	g.Go(func() error {
-		err := pc.fetchPlayerMaps(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerMaps(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
 	g.Go(func() error {
-		err := pc.fetchPlayerTrends(ctx, player, res.ProfileID, p)
+		err := pc.fetchPlayerTrends(ctx, player, prof.ProfileID, p)
 		return err
 	})
 
@@ -468,6 +501,94 @@ func (pc *PlayerController) fetchNewPlayer(ctx context.Context, n, p string) (*m
 	}
 
 	return player, nil
+}
+
+type playerPayload struct {
+	Score    float32
+	Platform string
+	Name     string
+	ID       string
+}
+
+func (pc *PlayerController) Player(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
+
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+
+	var p playerPayload
+	err := json.NewDecoder(r.Body).Decode(&p)
+	if err != nil {
+		response.ErrorJSON(w, err)
+		return
+	}
+
+	defer r.Body.Close()
+
+	//declared as not indexed
+	if p.Score == -1 {
+		log.Println("player is not indexed", p.Name, p.Score)
+		//fetch profile from index cache
+		val, err := pc.ic.DB.GetDel(ctx, p.ID).Bytes()
+		var profile model.PlayerProfile
+
+		if err == nil {
+			err := msgpack.Unmarshal(val, &profile)
+			if err != nil {
+				response.ErrorJSON(w, err)
+				return
+			}
+
+			log.Println(profile)
+
+			res, err := pc.fetchNewPlayer(ctx, p.Name, p.Platform, &profile)
+			if err != nil {
+				response.ErrorJSON(w, err)
+				return
+			}
+
+			ie := pc.ec.IndexPlayer(ctx, res, p.Platform)
+			if ie != nil {
+				response.ErrorJSON(w, ie)
+				return
+			}
+
+			ab, err := msgpack.Marshal(res.Aliases)
+			if err != nil {
+				response.ErrorJSON(w, err)
+				return
+			}
+
+			err = pc.pc.DB.Set(ctx, p.ID, ab, 1*time.Hour).Err()
+			if err != nil {
+				response.ErrorJSON(w, err)
+				return
+			}
+
+			response.SuccessJSON(w, startTime, res)
+			return
+		}
+	}
+
+	res, err := pc.ec.FetchPlayer(ctx, p.ID, p.Platform)
+	if err != nil {
+		response.ErrorJSON(w, err)
+		return
+	}
+
+	ab, err := msgpack.Marshal(res.Aliases)
+	if err != nil {
+		response.ErrorJSON(w, err)
+		return
+	}
+
+	err = pc.pc.DB.Set(ctx, p.ID, ab, 1*time.Hour).Err()
+	if err != nil {
+		response.ErrorJSON(w, err)
+		return
+	}
+
+	response.SuccessJSON(w, startTime, res)
 }
 
 func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
@@ -484,7 +605,7 @@ func (pc *PlayerController) Test(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer r.Body.Close()
-	res, err := pc.fetchNewPlayer(ctx, p.Player, p.Platform)
+	res, err := pc.fetchNewPlayer(ctx, p.Player, p.Platform, nil)
 	if err != nil {
 		response.ErrorJSON(w, err)
 		return

@@ -45,3 +45,13 @@ type SearchOutput struct {
 	Shards   SearchShards `json:"_shards"`
 	Hits     SearchHits   `json:"hits"`
 }
+
+type GetResult struct {
+	//Index string `json:"_index"`
+	ID string `json:"_id"`
+	//Version     int    `json:"_version"`
+	//SeqNo       int    `json:"_seq_no"`
+	//PrimaryTerm int    `json:"_primary_term"`
+	Found  bool   `json:"found"`
+	Source Player `json:"_source"`
+}
